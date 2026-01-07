@@ -1,0 +1,26 @@
+﻿@model CourseSection
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h2>Add Section</h2>
+
+<form method="post">
+    <input type="hidden" name="courseId" value="@ViewBag.CourseId" />
+
+    <div class="mb-3">
+        <label class="form-label">Section Title</label>
+        <input asp-for="CourseSectionName" class="form-control" />
+        <span asp-validation-for="CourseSectionName" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Save
+    </button>
+
+    <a asp-action="Index"
+       asp-route-courseId="@ViewBag.CourseId"
+       class="btn btn-secondary">
+        Cancel
+    </a>
+</form>

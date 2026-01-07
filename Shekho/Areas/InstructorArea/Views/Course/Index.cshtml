@@ -1,0 +1,76 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Thumbnail</th>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model)
+        {
+            <tr>
+                <td>
+                    <img src="@course.ThumbnailPath"
+                         width="80"
+                         class="img-thumbnail" />
+                </td>
+                <td>@course.CourseTitle</td>
+                <td>
+                    @(course.IsFree ? "Free" : "$" + course.CoursePrice)
+                </td>
+                <td>
+                    @if (course.IsApproved)
+                    {
+                        <span class="badge bg-success">Approved</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning">Pending</span>
+                    }
+                </td>
+                <td>
+                    <a asp-area="InstructorArea"
+                       asp-controller="Module"
+                       asp-action="Index"
+                       asp-route-courseId="@course.CourseId"
+                       class="btn btn-sm btn-info me-2">
+                        Sections
+                    </a>
+
+                    <a asp-action="EditCourse"
+                       asp-route-id="@course.CourseId"
+                       class="btn btn-sm btn-warning me-2">
+                        Edit
+                    </a>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@course.CourseId"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Are you sure you want to delete this course?');">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,19 @@
+﻿@model CourseSection
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h2>Edit Section</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="CourseSectionId" />
+
+    <div class="mb-3">
+        <label class="form-label">Section Title</label>
+        <input asp-for="CourseSectionName" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Update
+    </button>
+</form>

@@ -1,0 +1,55 @@
+﻿@model Course
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+<h2>Edit Course</h2>
+
+<form asp-action="EditCourse" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="CourseId" />
+
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input asp-for="CourseTitle" class="form-control" />
+        <span asp-validation-for="CourseTitle" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea asp-for="CourseDescription" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-check-label">
+            <input asp-for="IsFree" class="form-check-input" />
+            Free Course
+        </label>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Price</label>
+        <input asp-for="CoursePrice" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Current Thumbnail</label><br />
+        @if (!string.IsNullOrEmpty(Model.ThumbnailPath))
+        {
+            <img src="@Model.ThumbnailPath"
+                 class="img-thumbnail mb-2"
+                 width="150" />
+        }
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Change Thumbnail</label>
+        <input type="file" name="Thumbnail" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Update Course
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancel
+    </a>
+</form>

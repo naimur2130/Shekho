@@ -1,0 +1,32 @@
+﻿@model Lesson
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+<h2>Add Lesson</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="moduleId" value="@ViewBag.CourseSectionId" />
+
+    <div class="mb-3">
+        <label>Title</label>
+        <input asp-for="LessonTitle" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Video URL (YouTube)</label>
+        <input asp-for="VideoUrl" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Resource (PDF / DOC)</label>
+        <input type="file" name="resource" class="form-control" />
+    </div>
+
+    @* <div class="mb-3">
+        <input asp-for="IsPreview" /> Free Preview
+    </div> *@
+
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+
+

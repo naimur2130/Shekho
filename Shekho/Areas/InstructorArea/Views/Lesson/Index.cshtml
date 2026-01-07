@@ -1,0 +1,49 @@
+﻿@model IEnumerable<Lesson>
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+<h2>Lessons - @ViewBag.CourseSectionTitle</h2>
+
+<a asp-action="CreateLesson"
+   asp-route-moduleId="@ViewBag.CourseSectionId"
+   class="btn btn-primary mb-3">
+    + Add Lesson
+</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Order</th>
+            <th>Title</th>
+            @* <th>Preview</th> *@
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lesson in Model)
+        {
+            <tr>
+                <td>@lesson.Order</td>
+                <td>@lesson.LessonTitle</td>
+                @* <td>
+                    @(lesson.IsPreview ? "Yes" : "No")
+                </td> *@
+                <td>
+                    <a asp-action="EditLesson"
+                       asp-route-id="@lesson.LessonId"
+                       class="btn btn-sm btn-warning">
+                        Edit
+                    </a>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@lesson.LessonId"
+                       class="btn btn-sm btn-danger">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

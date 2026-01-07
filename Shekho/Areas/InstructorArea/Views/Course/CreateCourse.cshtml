@@ -1,0 +1,38 @@
+﻿@model Course
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+<h2>Create Course</h2>
+
+<form asp-action="CreateCourse" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label>Title</label>
+        <input asp-for="CourseTitle" class="form-control" />
+        <span asp-validation-for="CourseTitle" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Description</label>
+        <textarea asp-for="CourseDescription" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>
+            <input asp-for="IsFree" type="checkbox" /> Free Course
+        </label>
+    </div>
+
+    <div class="mb-3">
+        <label>Price</label>
+        <input asp-for="CoursePrice" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Thumbnail</label>
+        <input type="file" name="Thumbnail" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Save Course
+    </button>
+</form>

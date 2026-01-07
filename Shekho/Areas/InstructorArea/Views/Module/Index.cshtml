@@ -1,0 +1,58 @@
+﻿@model IEnumerable<CourseSection>
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+<h2>Sections - @ViewBag.CourseTitle</h2>
+
+<a asp-action="CreateModule"
+   asp-route-courseId="@ViewBag.CourseId"
+   class="btn btn-primary mb-3">
+    + Add Section
+</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Order</th>
+            <th>Title</th>
+            <th width="200">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in Model)
+        {
+            <tr>
+                <td>@i.Order</td>
+                <td>@i.CourseSectionName</td>
+                <td>
+                    <a asp-area="InstructorArea"
+                       asp-controller="Lesson"
+                       asp-action="Index"
+                       asp-route-moduleId="@i.CourseSectionId"
+                       class="btn btn-sm btn-info me-2">
+                        Lessons
+                    </a>
+                    <a asp-action="EditModule"
+                       asp-route-id="@i.CourseSectionId"
+                       class="btn btn-sm btn-warning">
+                        Edit
+                    </a>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@i.CourseSectionId"
+                       class="btn btn-sm btn-danger">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-area="InstructorArea"
+   asp-controller="Course"
+   asp-action="Index"
+   class="btn btn-secondary">
+    Back to Courses
+</a>
+

@@ -1,0 +1,26 @@
+﻿@model Lesson
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+<h2>Edit Lesson</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="LessonId" />
+
+    <div class="mb-3">
+        <label>Title</label>
+        <input asp-for="LessonTitle" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Video URL</label>
+        <input asp-for="VideoUrl" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Replace Resource</label>
+        <input type="file" name="Resource" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Update</button>
+</form>
