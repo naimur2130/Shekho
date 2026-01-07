@@ -32,10 +32,27 @@ namespace Shekho.Areas.InstructorArea.Controllers
             var CourseList = await _context.Course.Where(u=>u.InstructorId==user.Id).ToListAsync();
             return View(CourseList);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetSubCategoriesByCategory(int categoryId)
+        {
+            var subCategories = await _context.CourseSubCategory
+                .Where(sc => sc.CategoryId == categoryId)
+                .Select(sc => new
+                {
+                    sc.SubCategoryId,
+                    sc.SubCategoryName
+                })
+                .ToListAsync();
+
+            return Json(subCategories);
+        }
+
 
         [HttpGet]
         public IActionResult CreateCourse()
         {
+            ViewBag.Categories = _context.CourseCategory.ToList();
+
             return View();
         }
 
@@ -86,6 +103,8 @@ namespace Shekho.Areas.InstructorArea.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Categories = _context.CourseCategory.ToList();
+
             return View(course);
         }
 
@@ -99,15 +118,22 @@ namespace Shekho.Areas.InstructorArea.Controllers
                 return NotFound();
 
             if (!ModelState.IsValid)
+            {
+                ViewBag.Categories = _context.CourseCategory.ToList();
                 return View(model);
+            }
 
-            // ✅ Copy FORM values → DATABASE entity
+            // ✅ BASIC FIELDS
             model.CourseTitle = course.CourseTitle;
             model.CourseDescription = course.CourseDescription;
             model.IsFree = course.IsFree;
-            model.CoursePrice = course.CoursePrice;
+            model.CoursePrice = course.IsFree ? 0 : course.CoursePrice;
 
-            // ✅ Thumbnail handling
+            // ✅ CATEGORY & SUBCATEGORY (THIS WAS MISSING)
+            model.CategoryId = course.CategoryId;
+            model.SubCategoryId = course.SubCategoryId;
+
+            // ✅ THUMBNAIL
             if (Thumbnail != null)
             {
                 if (!string.IsNullOrEmpty(model.ThumbnailPath))
@@ -134,13 +160,10 @@ namespace Shekho.Areas.InstructorArea.Controllers
             }
 
             _context.Course.Update(model);
-
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
-
-
 
         [HttpGet]
         public async Task<IActionResult> Delete(int id)

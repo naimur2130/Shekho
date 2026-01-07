@@ -1,0 +1,29 @@
+﻿@model IEnumerable<CourseCategory>
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+<h3>Course Categories</h3>
+
+<a asp-action="Create" class="btn btn-primary mb-2">Add Category</a>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+@foreach (var item in Model)
+{
+    <tr>
+        <td>@item.CategoryName</td>
+        <td>
+             <a asp-area="InstructorArea"
+              asp-controller="CourseSubCategory"
+              asp-action="Index"
+              asp-route-categoryId="@item.CategoryId"
+              class="btn btn-info btn-sm">
+              View Subcategories
+             </a>
+        </td>
+    </tr>
+}
+</table>

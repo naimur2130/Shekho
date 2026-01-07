@@ -1,0 +1,23 @@
+﻿@model Shekho.Models.CourseSubCategory
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h2>Create Subcategory</h2>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="CategoryId" value="@ViewBag.CategoryId" />
+
+    <div class="mb-3">
+        <label asp-for="SubCategoryName" class="form-label"></label>
+        <input asp-for="SubCategoryName" class="form-control" />
+        <span asp-validation-for="SubCategoryName" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-action="Index"
+       asp-route-categoryId="@ViewBag.CategoryId"
+       class="btn btn-secondary">
+        Back
+    </a>
+</form>

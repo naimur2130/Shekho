@@ -498,7 +498,7 @@ namespace Shekho.Data.Migrations
             modelBuilder.Entity("Shekho.Models.CourseSubCategory", b =>
                 {
                     b.HasOne("Shekho.Models.CourseCategory", "Category")
-                        .WithMany("SubCategories")
+                        .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -531,11 +531,6 @@ namespace Shekho.Data.Migrations
             modelBuilder.Entity("Shekho.Models.Course", b =>
                 {
                     b.Navigation("courseSections");
-                });
-
-            modelBuilder.Entity("Shekho.Models.CourseCategory", b =>
-                {
-                    b.Navigation("SubCategories");
                 });
 
             modelBuilder.Entity("Shekho.Models.CourseSection", b =>

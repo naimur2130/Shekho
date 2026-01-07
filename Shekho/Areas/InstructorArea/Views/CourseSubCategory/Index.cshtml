@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Shekho.Models.CourseSubCategory>
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h2>Subcategories of @ViewBag.CategoryName</h2>
+
+<a asp-action="Create"
+   asp-route-categoryId="@ViewBag.CategoryId"
+   class="btn btn-primary mb-3">
+    Add Subcategory
+</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Subcategory Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sub in Model)
+        {
+            <tr>
+                <td>@sub.SubCategoryName</td>
+            </tr>
+        }
+    </tbody>
+</table>

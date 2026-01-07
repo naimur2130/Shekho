@@ -24,6 +24,25 @@
             Free Course
         </label>
     </div>
+    <div class="mb-3">
+    <label class="form-label">Category</label>
+    <select asp-for="CategoryId" class="form-select" id="CategoryId">
+        <option value="">-- Select Category --</option>
+        @foreach (var cat in ViewBag.Categories)
+        {
+            <option value="@cat.CategoryId">
+                @cat.CategoryName
+            </option>
+        }
+    </select>
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Sub Category</label>
+    <select asp-for="SubCategoryId" class="form-select" id="SubCategoryId">
+        <option value="">-- Select Sub Category --</option>
+    </select>
+</div>
 
     <div class="mb-3">
         <label class="form-label">Price</label>
@@ -53,3 +72,46 @@
         Cancel
     </a>
 </form>
+
+@section Scripts {
+<script>
+    const categoryDropdown = document.getElementById("CategoryId");
+    const subCategoryDropdown = document.getElementById("SubCategoryId");
+
+    const selectedCategoryId = "@Model.CategoryId";
+    const selectedSubCategoryId = "@Model.SubCategoryId";
+
+    function loadSubCategories(categoryId, selectedSubId = null) {
+        subCategoryDropdown.innerHTML =
+            '<option value="">-- Select Sub Category --</option>';
+
+        if (!categoryId) return;
+
+        fetch(`/InstructorArea/Course/GetSubCategoriesByCategory?categoryId=${categoryId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(sub => {
+                    const option = document.createElement("option");
+                    option.value = sub.subCategoryId;
+                    option.text = sub.subCategoryName;
+
+                    if (selectedSubId && sub.subCategoryId == selectedSubId) {
+                        option.selected = true;
+                    }
+
+                    subCategoryDropdown.appendChild(option);
+                });
+            });
+    }
+
+    // ✅ Load subcategories on page load
+    if (selectedCategoryId) {
+        loadSubCategories(selectedCategoryId, selectedSubCategoryId);
+    }
+
+    // ✅ Reload when category changes
+    categoryDropdown.addEventListener("change", function () {
+        loadSubCategories(this.value);
+    });
+</script>
+}

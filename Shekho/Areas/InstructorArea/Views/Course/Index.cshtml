@@ -1,6 +1,14 @@
 ﻿@{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
+<a asp-action="CreateCourse"
+   class="btn btn-primary mb-3">
+    + Add Course
+</a>
+<a asp-action="Index" asp-area="InstructorArea" asp-controller="CourseCategory"
+   class="btn btn-primary mb-3">
+    View Categories
+</a>
 
 <table class="table table-bordered">
     <thead>

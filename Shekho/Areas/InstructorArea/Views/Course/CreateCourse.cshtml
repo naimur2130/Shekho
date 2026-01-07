@@ -21,6 +21,25 @@
             <input asp-for="IsFree" type="checkbox" /> Free Course
         </label>
     </div>
+    <div class="mb-3">
+    <label>Category</label>
+    <select asp-for="CategoryId" class="form-select">
+        <option value="">-- Select Category --</option>
+        @foreach (var cat in ViewBag.Categories)
+        {
+            <option value="@cat.CategoryId">@cat.CategoryName</option>
+        }
+    </select>
+</div>
+
+<div class="mb-3">
+    <label>Sub Category</label>
+    <select asp-for="SubCategoryId" class="form-select" id="SubCategoryId">
+        <option value="">-- Select Sub Category --</option>
+    </select>
+</div>
+
+
 
     <div class="mb-3">
         <label>Price</label>
@@ -36,3 +55,27 @@
         Save Course
     </button>
 </form>
+
+@section Scripts {
+<script>
+    document.getElementById("CategoryId").addEventListener("change", function () {
+        const categoryId = this.value;
+        const subCategoryDropdown = document.getElementById("SubCategoryId");
+
+        subCategoryDropdown.innerHTML = '<option value="">-- Select Sub Category --</option>';
+
+        if (!categoryId) return;
+
+        fetch(`/InstructorArea/Course/GetSubCategoriesByCategory?categoryId=${categoryId}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(sub => {
+                    const option = document.createElement("option");
+                    option.value = sub.subCategoryId;
+                    option.text = sub.subCategoryName;
+                    subCategoryDropdown.appendChild(option);
+                });
+            });
+    });
+</script>
+}
