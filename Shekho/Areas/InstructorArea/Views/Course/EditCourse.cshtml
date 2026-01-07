@@ -44,6 +44,13 @@
     </select>
 </div>
 
+<div class="mb-3">
+    <label>Difficulty Level</label>
+    <select asp-for="DifficultyLevel" class="form-select" asp-items="ViewBag.DifficultyLevels">
+        <option value="">-- Select Difficulty Level --</option>
+    </select>
+    <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
+</div>
     <div class="mb-3">
         <label class="form-label">Price</label>
         <input asp-for="CoursePrice" class="form-control" />

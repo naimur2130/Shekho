@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Course>
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h2>Pending Courses</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Instructor</th>
+            <th>Category</th>
+            <th>SubCategory</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model)
+        {
+            <tr>
+                <td>@course.CourseTitle</td>
+                <td>@course.InstructorId</td>
+                <td>@course.Category?.CategoryName</td>
+                <td>@course.SubCategory?.SubCategoryName</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <form asp-action="Approve" method="post">
+                            <input type="hidden" name="id" value="@course.CourseId" />
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+
+                        <form asp-action="Reject" method="post">
+                            <input type="hidden" name="id" value="@course.CourseId" />
+                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -5,6 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shekho.Models
 {
+    public enum DifficultyLevel
+    {
+        Beginner,
+        Intermediate,
+        Advance
+    }
+
     public class Course
     {
         [Key]
@@ -21,6 +28,8 @@ namespace Shekho.Models
         public string? InstructorId { get; set; }
         public int? CategoryId { get; set; }
         public int? SubCategoryId { get; set; }
+        public DifficultyLevel DifficultyLevel { get; set; }
+        public int EnrollmentCount { get; set; }
 
         [ForeignKey("CategoryId")]
         [ValidateNever]

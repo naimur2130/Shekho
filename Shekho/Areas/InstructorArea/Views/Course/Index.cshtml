@@ -1,6 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
+
 <a asp-action="CreateCourse"
    class="btn btn-primary mb-3">
     + Add Course
@@ -17,6 +18,7 @@
             <th>Title</th>
             <th>Price</th>
             <th>Status</th>
+            <th>Published</th> <!-- New column -->
             <th>Actions</th>
         </tr>
     </thead>
@@ -43,6 +45,22 @@
                         <span class="badge bg-warning">Pending</span>
                     }
                 </td>
+
+                <!-- Published column -->
+                <td>
+                    @if (course.IsPublished)
+                    {
+                        <span class="badge bg-success">Published</span>
+                    }
+                    else
+                    {
+                        <form asp-action="PublishCourse" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@course.CourseId" />
+                            <button type="submit" class="btn btn-sm btn-primary">Publish</button>
+                        </form>
+                    }
+                </td>
+
                 <td>
                     <a asp-area="InstructorArea"
                        asp-controller="Module"
@@ -69,16 +87,3 @@
         }
     </tbody>
 </table>
-
-
-
-
-
-
-
-
-
-
-
-
-

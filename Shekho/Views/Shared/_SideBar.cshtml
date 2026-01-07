@@ -41,9 +41,9 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a asp-area="AdminArea" asp-controller="Admin" asp-action="Index" class="nav-link">
+                                <a asp-area="AdminArea" asp-controller="AdminCourse" asp-action="Index" class="nav-link">
                                     <i class="nav-icon bi bi-circle"></i>
-                                    <p>User List</p>
+                                    <p>Pending Requests</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -107,6 +107,32 @@
                                     <p>Hello</p>
                                 </a>
                             </li>
+                        </ul>
+                    </li>
+                </ul>
+            }
+            @if (User.IsInRole("Student"))
+            {
+                <ul class="nav sidebar-menu flex-column"
+                    data-lte-toggle="treeview"
+                    role="menu"
+                    data-accordion="false">
+                    <li class="nav-item menu-open">
+                        <a class="nav-link active">
+                            <i class="nav-icon bi bi-speedometer"></i>
+                            <p>
+                                Course
+                                <i class="nav-arrow bi bi-chevron-right"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a asp-area="StudentArea" asp-controller="Course" asp-action="Index" class="nav-link">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>My Courses</p>
+                                </a>
+                            </li>
+                            
                         </ul>
                     </li>
                 </ul>

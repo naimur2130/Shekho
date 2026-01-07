@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Shekho.Data;
 using Shekho.Models;
 
@@ -29,8 +30,28 @@ namespace Shekho.Areas.InstructorArea.Controllers
             {
                 return NotFound();
             }
-            var CourseList = await _context.Course.Where(u=>u.InstructorId==user.Id).ToListAsync();
+            var CourseList = await _context.Course
+                .Where(u => u.InstructorId == user.Id && u.IsApproved)
+                .ToListAsync();
             return View(CourseList);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PublishCourse(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var course = await _context.Course
+                .FirstOrDefaultAsync(c => c.CourseId == id && c.InstructorId == user.Id);
+
+            if (course == null)
+                return NotFound();
+
+            course.IsPublished = true;
+            _context.Course.Update(course);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
         [HttpGet]
         public async Task<IActionResult> GetSubCategoriesByCategory(int categoryId)
@@ -104,6 +125,7 @@ namespace Shekho.Areas.InstructorArea.Controllers
                 return NotFound();
             }
             ViewBag.Categories = _context.CourseCategory.ToList();
+            ViewBag.DifficultyLevels = new SelectList(Enum.GetValues(typeof(DifficultyLevel)));
 
             return View(course);
         }
@@ -123,17 +145,16 @@ namespace Shekho.Areas.InstructorArea.Controllers
                 return View(model);
             }
 
-            // ✅ BASIC FIELDS
             model.CourseTitle = course.CourseTitle;
             model.CourseDescription = course.CourseDescription;
             model.IsFree = course.IsFree;
             model.CoursePrice = course.IsFree ? 0 : course.CoursePrice;
 
-            // ✅ CATEGORY & SUBCATEGORY (THIS WAS MISSING)
             model.CategoryId = course.CategoryId;
             model.SubCategoryId = course.SubCategoryId;
+            model.DifficultyLevel = course.DifficultyLevel;
+            model.EnrollmentCount = course.EnrollmentCount;
 
-            // ✅ THUMBNAIL
             if (Thumbnail != null)
             {
                 if (!string.IsNullOrEmpty(model.ThumbnailPath))

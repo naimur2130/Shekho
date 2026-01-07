@@ -1,0 +1,111 @@
+﻿@model Shekho.ViewModels.CourseBrowsingViewModel
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h2>Browse Courses</h2>
+
+<form method="get" class="mb-3">
+    <div class="row g-2">
+
+        <!-- Category Filter -->
+        <div class="col-md-3">
+            <select class="form-select" name="categoryId">
+                <option value="">All Categories</option>
+                @foreach (var cat in Model.Categories)
+                {
+                    <option value="@cat.CategoryId"
+                            selected="@(Model.SelectedCategoryId == cat.CategoryId)">
+                        @cat.CategoryName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <!-- SubCategory Filter -->
+        <div class="col-md-3">
+            <select class="form-select" name="subCategoryId">
+                <option value="">All SubCategories</option>
+                @foreach (var sub in Model.SubCategories)
+                {
+                    <option value="@sub.SubCategoryId"
+                            selected="@(Model.SelectedSubCategoryId == sub.SubCategoryId)">
+                        @sub.SubCategoryName
+                    </option>
+                }
+            </select>
+        </div>
+
+        <!-- Difficulty Filter -->
+        <div class="col-md-2">
+            <select class="form-select" name="difficulty">
+                <option value="">All Levels</option>
+
+                <option value="Beginner"
+                        selected="@(Model.SelectedDifficulty == Shekho.Models.DifficultyLevel.Beginner)">
+                    Beginner
+                </option>
+
+                <option value="Intermediate"
+                        selected="@(Model.SelectedDifficulty == Shekho.Models.DifficultyLevel.Intermediate)">
+                    Intermediate
+                </option>
+
+                <option value="Advance"
+                        selected="@(Model.SelectedDifficulty == Shekho.Models.DifficultyLevel.Advance)">
+                    Advanced
+                </option>
+            </select>
+        </div>
+
+        <!-- Search -->
+        <div class="col-md-4">
+            <input type="text"
+                   class="form-control"
+                   name="searchTerm"
+                   placeholder="Search courses..."
+                   value="@Model.SearchTerm" />
+        </div>
+
+        <div class="col-md-12 mt-2">
+            <button type="submit" class="btn btn-primary">
+                Apply Filters
+            </button>
+        </div>
+
+    </div>
+</form>
+
+<hr />
+
+<div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+    @foreach (var course in Model.Courses)
+    {
+        <div class="col">
+            <div class="card h-100">
+                <img src="@course.ThumbnailPath"
+                     class="card-img-top"
+                     alt="@course.CourseTitle" />
+
+                <div class="card-body">
+                    <h5 class="card-title">@course.CourseTitle</h5>
+
+                    <p class="card-text">
+                        @course.Category?.CategoryName /
+                        @course.SubCategory?.SubCategoryName <br />
+                        Level: @course.DifficultyLevel <br />
+                        Price: @(course.IsFree ? "Free" : "$" + course.CoursePrice)
+                    </p>
+
+                    <a asp-area="StudentArea"
+                       asp-controller="Course"
+                       asp-action="Details"
+                       asp-route-id="@course.CourseId"
+                       class="btn btn-sm btn-primary">
+                        View Course
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

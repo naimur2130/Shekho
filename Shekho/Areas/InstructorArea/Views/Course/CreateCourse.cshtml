@@ -39,7 +39,17 @@
     </select>
 </div>
 
-
+<div class="mb-3">
+    <label>Difficulty Level</label>
+    <select asp-for="DifficultyLevel" class="form-select">
+        <option value="">-- Select Difficulty Level --</option>
+        @foreach (var level in Enum.GetValues(typeof(Shekho.Models.DifficultyLevel)))
+        {
+            <option value="@level">@level</option>
+        }
+    </select>
+    <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
+</div>
 
     <div class="mb-3">
         <label>Price</label>
