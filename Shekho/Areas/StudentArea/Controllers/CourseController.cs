@@ -45,7 +45,11 @@ namespace Shekho.Areas.StudentArea.Controllers
             {
                 Courses = await query.ToListAsync(),
                 Categories = await _context.CourseCategory.ToListAsync(),
-                SubCategories = await _context.CourseSubCategory.ToListAsync(),
+                SubCategories = categoryId.HasValue
+                  ? await _context.CourseSubCategory
+                  .Where(s => s.CategoryId == categoryId.Value)
+                  .ToListAsync()
+                  : new List<CourseSubCategory>(),
                 SelectedCategoryId = categoryId,
                 SelectedSubCategoryId = subCategoryId,
                 SelectedDifficulty = difficulty,
@@ -54,5 +58,36 @@ namespace Shekho.Areas.StudentArea.Controllers
 
             return View(model);
         }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var course = await _context.Course
+                .Include(c => c.Category)
+                .Include(c => c.SubCategory)
+                .Include(c => c.courseSections)!
+                    .ThenInclude(s => s.Lesson)
+                .FirstOrDefaultAsync(c => c.CourseId == id && c.IsApproved);
+
+            if (course == null)
+                return NotFound();
+
+            return View(course);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetByCategory(int categoryId)
+        {
+            var subCategories = await _context.CourseSubCategory
+                .Where(s => s.CategoryId == categoryId)
+                .Select(s => new
+                {
+                    subCategoryId = s.SubCategoryId,
+                    subCategoryName = s.SubCategoryName
+                })
+                .ToListAsync();
+
+            return Json(subCategories);
+        }
+
     }
 }

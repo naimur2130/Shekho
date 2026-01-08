@@ -9,32 +9,37 @@
     <div class="row g-2">
 
         <!-- Category Filter -->
-        <div class="col-md-3">
-            <select class="form-select" name="categoryId">
-                <option value="">All Categories</option>
-                @foreach (var cat in Model.Categories)
-                {
-                    <option value="@cat.CategoryId"
-                            selected="@(Model.SelectedCategoryId == cat.CategoryId)">
-                        @cat.CategoryName
-                    </option>
-                }
-            </select>
-        </div>
+<div class="col-md-3">
+    <select class="form-select"
+            id="categorySelect"
+            name="categoryId">
+        <option value="">All Categories</option>
+        @foreach (var cat in Model.Categories)
+        {
+            <option value="@cat.CategoryId"
+                    selected="@(Model.SelectedCategoryId == cat.CategoryId)">
+                @cat.CategoryName
+            </option>
+        }
+    </select>
+</div>
 
-        <!-- SubCategory Filter -->
-        <div class="col-md-3">
-            <select class="form-select" name="subCategoryId">
-                <option value="">All SubCategories</option>
-                @foreach (var sub in Model.SubCategories)
-                {
-                    <option value="@sub.SubCategoryId"
-                            selected="@(Model.SelectedSubCategoryId == sub.SubCategoryId)">
-                        @sub.SubCategoryName
-                    </option>
-                }
-            </select>
-        </div>
+<!-- SubCategory Filter -->
+<div class="col-md-3">
+    <select class="form-select"
+            id="subCategorySelect"
+            name="subCategoryId">
+        <option value="">All SubCategories</option>
+        @foreach (var sub in Model.SubCategories)
+        {
+            <option value="@sub.SubCategoryId"
+                    selected="@(Model.SelectedSubCategoryId == sub.SubCategoryId)">
+                @sub.SubCategoryName
+            </option>
+        }
+    </select>
+</div>
+
 
         <!-- Difficulty Filter -->
         <div class="col-md-2">
@@ -87,7 +92,7 @@
                      class="card-img-top"
                      alt="@course.CourseTitle" />
 
-                <div class="card-body">
+                <div class="card-body d-flex flex-column">
                     <h5 class="card-title">@course.CourseTitle</h5>
 
                     <p class="card-text">
@@ -97,15 +102,73 @@
                         Price: @(course.IsFree ? "Free" : "$" + course.CoursePrice)
                     </p>
 
-                    <a asp-area="StudentArea"
-                       asp-controller="Course"
-                       asp-action="Details"
-                       asp-route-id="@course.CourseId"
-                       class="btn btn-sm btn-primary">
-                        View Course
-                    </a>
+                    <div class="mt-auto d-flex justify-content-between">
+                        <!-- View Course -->
+                        <a asp-area="StudentArea"
+                           asp-controller="Course"
+                           asp-action="Details"
+                           asp-route-id="@course.CourseId"
+                           class="btn btn-sm btn-outline-primary">
+                            View
+                        </a>
+
+                        <!-- Enroll Button -->
+                        <a asp-area="StudentArea"
+                           asp-controller="Enrollment"
+                           asp-action="Enroll"
+                           asp-route-courseId="@course.CourseId"
+                           class="btn btn-sm btn-success">
+                            Enroll
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     }
 </div>
+
+
+@section Scripts {
+<script>
+    const categorySelect = document.getElementById("categorySelect");
+    const subSelect = document.getElementById("subCategorySelect");
+
+    function loadSubCategories(categoryId, selectedSubCategoryId = null) {
+        subSelect.innerHTML = '<option value="">All SubCategories</option>';
+
+        if (!categoryId) return;
+
+        fetch(`/StudentArea/Course/GetByCategory?categoryId=${categoryId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(sub => {
+                    const option = document.createElement("option");
+                    option.value = sub.subCategoryId;
+                    option.textContent = sub.subCategoryName;
+
+                    if (selectedSubCategoryId &&
+                        selectedSubCategoryId == sub.subCategoryId) {
+                        option.selected = true;
+                    }
+
+                    subSelect.appendChild(option);
+                });
+            });
+    }
+
+    // Change event
+    categorySelect.addEventListener("change", function () {
+        loadSubCategories(this.value);
+    });
+
+    // 🔥 AUTO LOAD on page refresh
+    const selectedCategoryId = "@Model.SelectedCategoryId";
+    const selectedSubCategoryId = "@Model.SelectedSubCategoryId";
+
+    if (selectedCategoryId) {
+        loadSubCategories(selectedCategoryId, selectedSubCategoryId);
+    }
+</script>
+}
+
+

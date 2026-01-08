@@ -1,8 +1,10 @@
+using BeadedShop;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shekho.Data;
 using Shekho.Services;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<FormOptions>(options =>
@@ -25,6 +27,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 builder.Services.AddRazorPages();
 
