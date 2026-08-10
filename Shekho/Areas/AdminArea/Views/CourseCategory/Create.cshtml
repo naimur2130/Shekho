@@ -1,0 +1,67 @@
+﻿@model CourseCategory
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<style>
+    /* Card style */
+    .card-category {
+        border-radius: 1rem;
+        background: #fff;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        max-width: 500px;
+        margin: 2rem auto;
+    }
+
+    .card-category:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.15);
+    }
+
+    .card-category .card-header {
+        background: #28a745;
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.2rem;
+        border-radius: 1rem 1rem 0 0;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .card-category .form-label {
+        font-weight: 500;
+    }
+
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 6px rgba(40, 167, 69, 0.4);
+    }
+
+    .btn-success {
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+</style>
+
+<div class="card card-category">
+    <div class="card-header">
+        Create New Category
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div class="mb-3">
+                <label class="form-label">Category Name</label>
+                <input asp-for="CategoryName" class="form-control" placeholder="Enter category name" />
+                <span asp-validation-for="CategoryName" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-success w-100">
+                <i class="bi bi-save me-1"></i> Save Category
+            </button>
+        </form>
+    </div>
+</div>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shekho.Data;
@@ -7,6 +8,7 @@ using Shekho.Models;
 namespace Shekho.Areas.InstructorArea.Controllers
 {
     [Area("InstructorArea")]
+    [Authorize(Roles = "Instructor")]
     public class ModuleController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,14 +25,14 @@ namespace Shekho.Areas.InstructorArea.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var course = await _context.Course.Include(u=>u.courseSections)
-            .FirstOrDefaultAsync(u=>u.CourseId == courseId && u.InstructorId==user.Id);
+            .FirstOrDefaultAsync(u=>u.CourseId == courseId && u.InstructorId==user!.Id);
             if (course == null)
             {
                 return NotFound();
             }
             ViewBag.CourseId = courseId;
             ViewBag.CourseTitle = course.CourseTitle;
-            return View(course.courseSections.OrderBy(u=>u.Order).ToList());
+            return View(course.courseSections!.OrderBy(u=>u.Order).ToList());
         }
 
         [HttpGet]
@@ -46,7 +48,7 @@ namespace Shekho.Areas.InstructorArea.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var course = await _context.Course.FirstOrDefaultAsync
-                (u => u.CourseId == courseId && u.InstructorId == user.Id);
+                (u => u.CourseId == courseId && u.InstructorId == user!.Id);
             if (course == null)
             {
                 return NotFound();

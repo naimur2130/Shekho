@@ -1,0 +1,116 @@
+﻿@model IEnumerable<Shekho.Models.InstructorProfile>
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h3 class="mb-4 text-center">Pending Instructor Approvals</h3>
+
+<style>
+    /* === Table Card Container === */
+    .table-card {
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        overflow-x: auto;
+    }
+
+    /* === Table Styling === */
+    .table-card table {
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+        width: 100%;
+    }
+    .table-card thead tr {
+        background: #1abc9c;
+        color: #fff;
+        border-radius: 12px;
+    }
+    .table-card th, .table-card td {
+        vertical-align: middle;
+        text-align: center;
+    }
+    .table-card tbody tr {
+        background: #f4f7f9;
+        border-radius: 8px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .table-card tbody tr:hover {
+        background: #e0f7f1;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    /* === Buttons === */
+    .table-card .btn-success {
+        border-radius: 6px;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+    .table-card .btn-success:hover {
+        background: #16a085;
+    }
+    .table-card .btn-danger {
+        border-radius: 6px;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+    .table-card .btn-danger:hover {
+        background: #c0392b;
+    }
+</style>
+
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Qualification</th>
+                <th>View Document</th>
+                <th>Photo</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var instructor in Model)
+            {
+                <tr>
+                    <td>@instructor.FullName</td>
+                    <td>@instructor.User.Email</td>
+                    <td>@instructor.PhoneNumber</td>
+                    <td>@instructor.Qualification</td>
+                    <td>
+                        <p>Required Document: 
+                        <a href="@Url.Content(instructor.IdDocumentPath)" target="_blank">View</a>
+                        </p>
+                    </td>
+                    <td>
+                    @if (!string.IsNullOrEmpty(instructor.ProfilePicturePath))
+                    {
+                        <img src="@Url.Content(instructor.ProfilePicturePath)" 
+                             alt="Profile Picture" 
+                             style="width:50px; height:50px; border-radius:5%; object-fit:cover; border:1px solid #ccc;" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Photo</span>
+                    }
+                    </td>
+
+                    <td>
+                        <form asp-action="ApproveInstructor" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@instructor.ProfileId" />
+                            <button class="btn btn-success btn-sm">Approve</button>
+                        </form>
+                        <form asp-action="RejectInstructor" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@instructor.ProfileId" />
+                            <button class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

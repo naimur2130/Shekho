@@ -15,5 +15,7 @@ namespace Shekho.ViewModels
         public DifficultyLevel? SelectedDifficulty { get; set; }
 
         public string SearchTerm { get; set; }
+        public List<int> EnrolledCourseIds { get; set; } = new();
+        public int SelectedCourseId { get; set; }
     }
 }

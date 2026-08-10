@@ -1,57 +1,111 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shekho.Data;
+using Shekho.Services;
 
-[Area("AdminArea")]
-public class AdminCourseController : Controller
+namespace Shekho.Areas.AdminArea.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public AdminCourseController(ApplicationDbContext context)
+    [Area("AdminArea")]
+    [Authorize(Roles = "Admin")]
+    public class AdminCourseController : Controller
     {
-        _context = context;
-    }
-    public async Task<IActionResult> Index()
-    {
-        var pendingCourses = await _context.Course
-            .Where(c => !c.IsApproved)
-            .Include(c => c.Category)
-            .Include(c => c.SubCategory)
-            .ToListAsync();
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IEmailService _emailService;
 
-        return View(pendingCourses);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Approve(int id)
-    {
-        var course = await _context.Course.FirstOrDefaultAsync(c => c.CourseId == id);
-        if (course == null) return NotFound();
-
-        course.IsApproved = true;
-        await _context.SaveChangesAsync();
-
-        return RedirectToAction(nameof(Index));
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Reject(int id)
-    {
-        var course = await _context.Course.FirstOrDefaultAsync(c => c.CourseId == id);
-        if (course == null) return NotFound();
-
-        if (!string.IsNullOrEmpty(course.ThumbnailPath))
+        public AdminCourseController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IEmailService emailService)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", course.ThumbnailPath.TrimStart('/'));
-            if (System.IO.File.Exists(filePath))
-                System.IO.File.Delete(filePath);
+            _context = context;
+            _userManager = userManager;
+            _emailService = emailService;
+        }
+        public async Task<IActionResult> Index()
+        {
+            var pendingCourses = await _context.Course
+                .Where(c => !c.IsApproved)
+                .Include(c => c.Category)
+                .Include(c => c.SubCategory)
+                .ToListAsync();
+
+            return View(pendingCourses);
         }
 
-        _context.Course.Remove(course);
-        await _context.SaveChangesAsync();
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Approve(int id)
+        {
+            var course = await _context.Course
+                .FirstOrDefaultAsync(c => c.CourseId == id);
 
-        return RedirectToAction(nameof(Index));
+            if (course == null)
+                return NotFound();
+
+            course.IsApproved = true;
+            await _context.SaveChangesAsync();
+
+            
+            var instructor = await _userManager.FindByIdAsync(course.InstructorId!);
+
+            if (instructor != null)
+            {
+                var subject = "🎉 Your Course Has Been Approved!";
+                var body = $@"
+            <h2>Congratulations!</h2>
+            <p>Your course <strong>{course.CourseTitle}</strong> has been approved.</p>
+            <p>It is now visible to students.</p>
+        ";
+
+                await _emailService.SendEmailAsync(instructor.Email!, subject, body);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reject(int id)
+        {
+            var course = await _context.Course
+                .FirstOrDefaultAsync(c => c.CourseId == id);
+
+            if (course == null)
+                return NotFound();
+
+            
+            var instructor = await _userManager.FindByIdAsync(course.InstructorId!);
+            if (instructor != null)
+            {
+                var subject = "❌ Course Rejected";
+                var body = $@"
+            <h2>Course Rejected</h2>
+            <p>Unfortunately, your course <strong>{course.CourseTitle}</strong> was rejected.</p>
+            <p>Please review the guidelines and resubmit.</p>
+        ";
+
+                await _emailService.SendEmailAsync(instructor.Email!, subject, body);
+            }
+
+            
+            if (!string.IsNullOrEmpty(course.ThumbnailPath))
+            {
+                var filePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    course.ThumbnailPath.TrimStart('/'));
+
+                if (System.IO.File.Exists(filePath))
+                    System.IO.File.Delete(filePath);
+            }
+
+            _context.Course.Remove(course);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
+
 }

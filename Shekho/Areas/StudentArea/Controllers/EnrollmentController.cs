@@ -1,28 +1,36 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shekho.Data;
 using Shekho.Models;
+using Shekho.Services;
+using Shekho.ViewModels;
 using Stripe.Checkout;
+using Stripe.V2;
+using System;
 
 namespace Shekho.Areas.StudentArea.Controllers
 {
     [Area("StudentArea")]
+    [Authorize(Roles = "Student")]
     public class EnrollmentController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IEmailService _emailService;
 
         public EnrollmentController(ApplicationDbContext context,
-                                    UserManager<IdentityUser> userManager)
+                                    UserManager<IdentityUser> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Enroll(int courseId)
         {
-            if (!User.Identity.IsAuthenticated)
+            if (!User.Identity!.IsAuthenticated)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
 
             var course = await _context.Course
@@ -44,7 +52,7 @@ namespace Shekho.Areas.StudentArea.Controllers
                 var enrollment = new Enrollment
                 {
                     CourseId = courseId,
-                    StudentId = userId,
+                    StudentId = userId!,
                     IsPaid = false
                 };
 
@@ -65,60 +73,63 @@ namespace Shekho.Areas.StudentArea.Controllers
             if (course == null)
                 return NotFound();
 
+            const decimal BdtToUsdRate = 0.00786m;
+            decimal usdPrice = Math.Round(course.CoursePrice!.Value * BdtToUsdRate, 2);
+
+
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
+
                 LineItems = new List<SessionLineItemOptions>
+        {
+            new()
+            {
+                PriceData = new SessionLineItemPriceDataOptions
                 {
-                    new()
+                    Currency = "usd",
+                    UnitAmount = (long)(usdPrice * 100),
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
-                        {
-                            Currency = "usd",
-                            UnitAmount = (long)(course.CoursePrice * 100),
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = course.CourseTitle
-                            }
-                        },
-                        Quantity = 1
+                        Name = course.CourseTitle
                     }
                 },
-                Mode = "payment",
-                SuccessUrl = Url.Action(
-                    "PaymentSuccess",
-                    "Enrollment",
-                    null,
-                    Request.Scheme),
+                Quantity = 1
+            }
+        },
 
+                Mode = "payment",
+
+                SuccessUrl = Url.Action("PaymentSuccess", "Enrollment", null, Request.Scheme),
                 CancelUrl = Url.Action(
-                    "PaymentCancel",
-                    "Enrollment",
-                    null,
-                    Request.Scheme)
+            "PaymentCancel",
+            "Enrollment",
+            new { id = course.CourseId },
+            Request.Scheme
+        )
             };
 
             var service = new SessionService();
             var session = service.Create(options);
 
-            // 🔐 Store session data securely
             TempData["StripeSessionId"] = session.Id;
             TempData["CourseId"] = courseId;
 
             return Redirect(session.Url);
         }
 
+
         public async Task<IActionResult> PaymentSuccess()
         {
-            if (!User.Identity.IsAuthenticated)
+            if (!User.Identity!.IsAuthenticated)
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
 
             if (TempData["StripeSessionId"] == null ||
                 TempData["CourseId"] == null)
                 return RedirectToAction("Index", "Course", new { area = "StudentArea" });
 
-            var sessionId = TempData["StripeSessionId"].ToString();
-            var courseId = (int)TempData["CourseId"];
+            var sessionId = TempData["StripeSessionId"]!.ToString();
+            var courseId = (int)TempData["CourseId"]!;
             var userId = _userManager.GetUserId(User);
 
             var service = new SessionService();
@@ -132,24 +143,47 @@ namespace Shekho.Areas.StudentArea.Controllers
 
             if (!exists)
             {
+                decimal amount = session.AmountTotal!.Value / 100m;
                 var enrollment = new Enrollment
                 {
                     CourseId = courseId,
-                    StudentId = userId,
+                    StudentId = userId!,
                     IsPaid = true,
+                    AmountPaid = amount,
+                    InstructorAmount = amount * 0.70m,
+                    AdminAmount = amount * 0.30m,
                     PaymentIntentId = session.PaymentIntentId
                 };
 
                 _context.Enrollment.Add(enrollment);
                 await _context.SaveChangesAsync();
+
+                // 🔔 SEND EMAIL
+                var user = await _userManager.GetUserAsync(User);
+                var subject = "Payment Successful 🎉";
+                var body = $@"
+                <h2>Payment Successful</h2>
+                <p>You have successfully enrolled in the course.</p>
+                <p><strong>Amount Paid:</strong> ${amount}</p>
+                <p>Thank you for learning with us!</p>
+                ";
+
+                await _emailService.SendEmailAsync(user!.Email!, subject, body);
+
             }
 
             return View("Success");
         }
 
-        public IActionResult PaymentCancel()
+        public IActionResult PaymentCancel(int id)
         {
-            return View();
+            var model = new CourseBrowsingViewModel
+            {
+                SelectedCourseId = id
+            };
+
+            return View(model);
         }
+
     }
 }

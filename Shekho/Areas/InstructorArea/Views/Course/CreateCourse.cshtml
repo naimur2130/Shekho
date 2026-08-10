@@ -2,72 +2,149 @@
 @{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
-<h2>Create Course</h2>
 
-<form asp-action="CreateCourse" method="post" enctype="multipart/form-data">
-    <div class="mb-3">
-        <label>Title</label>
-        <input asp-for="CourseTitle" class="form-control" />
-        <span asp-validation-for="CourseTitle" class="text-danger"></span>
+<style>
+    /* Card */
+    .course-card {
+        border: none;
+        border-radius: 1rem;
+        background: #ffffff;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow: hidden;
+    }
+
+    .course-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Card header */
+    .course-card-header {
+        background: linear-gradient(90deg, #28a745, #218838);
+        color: #fff;
+        padding: 1rem 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+
+    /* Form inputs */
+    .form-control:focus, .form-select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 6px rgba(40, 167, 69, 0.3);
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    /* Submit button */
+    .btn-save {
+        background: linear-gradient(90deg, #28a745, #218838);
+        color: #fff;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-save:hover {
+        background: linear-gradient(90deg, #218838, #1e7e34);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+
+    /* File input */
+    input[type="file"] {
+        border-radius: 0.5rem;
+    }
+
+</style>
+
+<div class="card course-card mx-auto" style="max-width: 700px; margin-top: 2rem;">
+    <div class="course-card-header">
+        Create New Course
     </div>
 
-    <div class="mb-3">
-        <label>Description</label>
-        <textarea asp-for="CourseDescription" class="form-control"></textarea>
-    </div>
+    <div class="card-body p-4">
+        <form asp-action="CreateCourse" method="post" enctype="multipart/form-data">
 
-    <div class="mb-3">
-        <label>
-            <input asp-for="IsFree" type="checkbox" /> Free Course
-        </label>
+            <!-- Title -->
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <input asp-for="CourseTitle" class="form-control form-control-lg" placeholder="Enter course title" />
+                <span asp-validation-for="CourseTitle" class="text-danger"></span>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea asp-for="CourseDescription" class="form-control form-control-lg" rows="4" placeholder="Course description"></textarea>
+            </div>
+
+            <!-- Free Course -->
+            <div class="form-check mb-3">
+                <input asp-for="IsFree" class="form-check-input" type="checkbox" id="IsFree" />
+                <label class="form-check-label" for="IsFree">Free Course</label>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select asp-for="CategoryId" class="form-select form-select-lg" id="CategoryId">
+                    <option value="">-- Select Category --</option>
+                    @foreach (var cat in ViewBag.Categories)
+                    {
+                        <option value="@cat.CategoryId">@cat.CategoryName</option>
+                    }
+                </select>
+            </div>
+
+            <!-- SubCategory -->
+            <div class="mb-3">
+                <label class="form-label">Sub Category</label>
+                <select asp-for="SubCategoryId" class="form-select form-select-lg" id="SubCategoryId">
+                    <option value="">-- Select Sub Category --</option>
+                </select>
+            </div>
+
+            <!-- Difficulty -->
+            <div class="mb-3">
+                <label class="form-label">Difficulty Level</label>
+                <select asp-for="DifficultyLevel" class="form-select form-select-lg">
+                    <option value="">-- Select Difficulty Level --</option>
+                    @foreach (var level in Enum.GetValues(typeof(Shekho.Models.DifficultyLevel)))
+                    {
+                        <option value="@level">@level</option>
+                    }
+                </select>
+                <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-3">
+                <label class="form-label">Price</label>
+                <input asp-for="CoursePrice" id="CoursePrice" class="form-control form-control-lg" placeholder="Enter price" />
+            </div>
+
+            <!-- Thumbnail -->
+            <div class="mb-4">
+                <label class="form-label">Thumbnail</label>
+                <input type="file" name="Thumbnail" class="form-control" />
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-save btn-lg w-100">
+                <i class="bi bi-save me-2"></i> Save Course
+            </button>
+        </form>
     </div>
-    <div class="mb-3">
-    <label>Category</label>
-    <select asp-for="CategoryId" class="form-select">
-        <option value="">-- Select Category --</option>
-        @foreach (var cat in ViewBag.Categories)
-        {
-            <option value="@cat.CategoryId">@cat.CategoryName</option>
-        }
-    </select>
 </div>
-
-<div class="mb-3">
-    <label>Sub Category</label>
-    <select asp-for="SubCategoryId" class="form-select" id="SubCategoryId">
-        <option value="">-- Select Sub Category --</option>
-    </select>
-</div>
-
-<div class="mb-3">
-    <label>Difficulty Level</label>
-    <select asp-for="DifficultyLevel" class="form-select">
-        <option value="">-- Select Difficulty Level --</option>
-        @foreach (var level in Enum.GetValues(typeof(Shekho.Models.DifficultyLevel)))
-        {
-            <option value="@level">@level</option>
-        }
-    </select>
-    <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
-</div>
-
-    <div class="mb-3">
-        <label>Price</label>
-        <input asp-for="CoursePrice" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Thumbnail</label>
-        <input type="file" name="Thumbnail" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-success">
-        Save Course
-    </button>
-</form>
 
 @section Scripts {
 <script>
+    // SubCategory dynamic load
     document.getElementById("CategoryId").addEventListener("change", function () {
         const categoryId = this.value;
         const subCategoryDropdown = document.getElementById("SubCategoryId");
@@ -87,5 +164,22 @@
                 });
             });
     });
+
+    const isFreeCheckbox = document.getElementById("IsFree");
+    const priceInput = document.getElementById("CoursePrice");
+
+    function togglePrice() {
+        if (isFreeCheckbox.checked) {
+            priceInput.value = 0;      
+            priceInput.disabled = true;
+        } else {
+            priceInput.disabled = false;
+        }
+    }
+
+    togglePrice();
+
+    isFreeCheckbox.addEventListener("change", togglePrice);
 </script>
 }
+

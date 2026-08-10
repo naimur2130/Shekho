@@ -1,0 +1,133 @@
+﻿@model Shekho.Models.InstructorProfile
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h3 class="mb-4 text-center">
+    @(Model.ProfileId == 0 ? "Complete Your Instructor Profile" : "Update Your Profile")
+</h3>
+
+<style>
+    /* === Form Card Styling === */
+    .instructor-card {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        max-width: 650px;
+        margin: auto;
+        transition: all 0.3s ease;
+    }
+    .instructor-card:hover {
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    /* === Input Focus Styling === */
+    .instructor-card input.form-control,
+    .instructor-card textarea.form-control,
+    .instructor-card select.form-control {
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .instructor-card input.form-control:focus,
+    .instructor-card textarea.form-control:focus {
+        border-color: #1abc9c;
+        box-shadow: 0 0 8px rgba(26, 188, 156, 0.2);
+        outline: none;
+    }
+
+    /* === Labels === */
+    .instructor-card label {
+        font-weight: 600;
+        color: #34495e;
+    }
+
+    /* === Buttons === */
+    .instructor-card .btn-primary {
+        background: #1abc9c;
+        border: none;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: background 0.3s;
+    }
+    .instructor-card .btn-primary:hover {
+        background: #16a085;
+    }
+
+    /* === File link styling === */
+    .instructor-card a {
+        color: #3498db;
+        text-decoration: underline;
+    }
+    .instructor-card a:hover {
+        color: #2980b9;
+        text-decoration: none;
+    }
+
+    
+</style>
+
+<div class="instructor-card">
+    <form asp-action="InstructorDetails" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="UserId" />
+
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Address" class="form-label"></label>
+            <input asp-for="Address" class="form-control" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Qualification" class="form-label"></label>
+            <input asp-for="Qualification" class="form-control" />
+            <span asp-validation-for="Qualification" class="text-danger"></span>
+        </div>
+
+            <div class="mb-3">
+        <label asp-for="IdDocumentPath" class="form-label">Upload ID Document</label>
+        <input type="file" name="IdDocument" class="form-control" />
+
+        @if (!string.IsNullOrEmpty(Model.IdDocumentPath))
+        {
+            <p>Current Document: 
+                <a href="@Url.Content(Model.IdDocumentPath)" target="_blank">View</a>
+            </p>
+        }
+
+        <span asp-validation-for="IdDocumentPath" class="text-danger"></span>
+         </div>
+         <div class="mb-3">
+        <label asp-for="ProfilePicturePath" class="form-label">Upload Profile Picture</label>
+        <input type="file" name="ProfilePicture" class="form-control" />
+
+        @if (!string.IsNullOrEmpty(Model.ProfilePicturePath))
+        {
+            <p>Current Picture:</p>
+            <img src="@Url.Content(Model.ProfilePicturePath)" alt="Profile Picture" style="max-width:150px; max-height:150px; border-radius:5%; border:1px solid #ccc;" />
+        }
+
+        <span asp-validation-for="ProfilePicturePath" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+            @(Model.ProfileId == 0 ? "Submit for Approval" : "Update Profile")
+        </button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

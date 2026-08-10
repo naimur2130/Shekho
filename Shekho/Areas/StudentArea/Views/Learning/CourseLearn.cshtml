@@ -1,0 +1,289 @@
+﻿@model Shekho.ViewModels.CourseLearningViewModel
+
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+
+    int totalLessons = Model.Course.courseSections.Sum(s => s.Lesson.Count);
+    int completedLessons = Model.CompletedLessonIds.Count;
+    bool allLessonsCompleted = totalLessons > 0 && completedLessons == totalLessons;
+}
+<style>
+.learning-wrapper {
+    background: #f4f6f9;
+    padding: 1.5rem;
+    border-radius: 1rem;
+}
+
+.sidebar-card,
+.content-card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    background: #ffffff;
+}
+
+.lesson-item a {
+    text-decoration: none;
+    font-weight: 500;
+    color: #000;
+}
+
+.lesson-item a:hover {
+    text-decoration: underline;
+}
+
+.lesson-item span.text-muted {
+    color: rgba(0,0,0,0.5);
+}
+
+.sidebar-card .list-group-item {
+    background: #ffffff;
+    border: none;
+    margin-bottom: 0.3rem;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.sidebar-card .list-group-item:hover {
+    background: #f0f0f0;
+}
+
+.video-wrapper {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.progress {
+    height: 22px;
+    border-radius: 1rem;
+}
+
+.progress-bar {
+    font-weight: 600;
+}
+
+.sidebar-card {
+    background: linear-gradient(135deg, #d8b4ff, #b5bfff, #a0e0ff);
+    color: #fff;
+    padding: 1rem;
+}
+
+.sidebar-card strong {
+    color: #fff;
+}
+
+.quiz-certificate-section {
+    margin-top: 1rem;
+}
+
+.btn-disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+</style>
+
+<div class="learning-wrapper">
+
+    <div class="row g-4">
+
+        <!-- LEFT: COURSE CONTENT -->
+        <div class="col-md-4">
+            <div class="card sidebar-card h-100">
+                <div class="card-body">
+
+                    <h5 class="fw-semibold mb-3">📚 Course Content</h5>
+
+                    @foreach (var sec in Model.Course.courseSections.OrderBy(s => s.Order))
+                    {
+                        <div class="mb-3">
+                            <strong>@sec.CourseSectionName</strong>
+
+                            <ul class="list-group mt-2">
+                                @{
+                                    var orderedLessons = sec.Lesson.OrderBy(l => l.Order).ToList();
+                                }
+
+                                @for (int i = 0; i < orderedLessons.Count; i++)
+                                {
+                                    var lesson = orderedLessons[i];
+                                    bool completed = Model.CompletedLessonIds.Contains(lesson.LessonId);
+                                    bool unlocked = i == 0 || Model.CompletedLessonIds.Contains(orderedLessons[i - 1].LessonId);
+
+                                    <li class="list-group-item d-flex justify-content-between align-items-center lesson-item">
+
+                                        @if (unlocked)
+                                        {
+                                            <a href="#"
+                                               onclick="loadLesson('@Url.Content(lesson.ResourcePath)', @lesson.LessonId)">
+                                                @lesson.LessonTitle
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                🔒 @lesson.LessonTitle
+                                            </span>
+                                        }
+
+                                        @if (completed)
+                                        {
+                                            <span class="text-success fw-bold">✔</span>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: VIDEO & PROGRESS -->
+        <div class="col-md-8">
+            <div class="card content-card">
+                <div class="card-body">
+
+                    <h4 class="fw-semibold mb-3">
+                        🎓 @Model.Course.CourseTitle
+                    </h4>
+
+                    <!-- Progress -->
+                    @{
+                        int percent = totalLessons == 0 ? 0 : (completedLessons * 100) / totalLessons;
+                    }
+                    <div class="progress mb-4">
+                        <div class="progress-bar bg-success" style="width:@percent%">
+                            @percent%
+                        </div>
+                    </div>
+
+                    <!-- Video -->
+                    <div class="video-wrapper mb-3">
+                        <video id="videoPlayer"
+                               class="w-100 rounded"
+                               controls
+                               onended="videoEnded()">
+                        </video>
+                    </div>
+
+                    <button id="completeBtn"
+                            class="btn btn-success"
+                            style="display:none"
+                            onclick="completeLesson()">
+                        ✔ Mark Lesson Completed
+                    </button>
+
+                    <!-- Quiz & Certificate -->
+                   @if (allLessonsCompleted)
+{
+    <div class="quiz-certificate-section card mt-4">
+        <div class="card-body text-center bg-light rounded">
+
+            <h5 class="mb-3">🎓 Course Completion</h5>
+
+            <!-- Quiz / Retake -->
+ @if (Model.QuizPassed)
+{
+    <span class="badge bg-success mb-2">✔ Passed</span>
+}
+else if (!Model.QuizPassed && Model.QuizAttempted)
+{
+    <a asp-area="StudentArea"
+       asp-controller="Quiz"
+       asp-action="AttemptQuiz"
+       asp-route-courseId="@Model.Course.CourseId"
+       class="btn btn-warning mb-2">
+        Retake Quiz
+    </a>
+}
+else
+{
+    <a asp-area="StudentArea"
+       asp-controller="Quiz"
+       asp-action="AttemptQuiz"
+       asp-route-courseId="@Model.Course.CourseId"
+       class="btn btn-primary mb-2">
+        Take Final Quiz
+    </a>
+}
+
+
+            <br />
+
+            <!-- Certificate -->
+            @if (Model.QuizPassed)
+            {
+                <a asp-action="DownloadCertificate"
+                   asp-controller="Learning"
+                   asp-route-courseId="@Model.Course.CourseId"
+                   class="btn btn-success mt-2">
+                    Download Certificate
+                </a>
+            }
+            else
+            {
+                <button class="btn btn-secondary btn-disabled mt-2" disabled>
+                    Complete quiz to unlock certificate
+                </button>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <span class="badge bg-secondary text-white mt-3">
+        Finish all lessons to unlock quiz & certificate
+    </span>
+}
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let currentLessonId = 0;
+
+    function loadLesson(videoUrl, lessonId) {
+        const player = document.getElementById("videoPlayer");
+        player.src = videoUrl;
+        player.load();
+
+        currentLessonId = lessonId;
+        document.getElementById("completeBtn").style.display = "inline-block";
+    }
+
+    function completeLesson() {
+        fetch('/StudentArea/Learning/CompleteLesson', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `lessonId=${currentLessonId}&courseId=@Model.Course.CourseId`
+        })
+        .then(() => location.reload());
+    }
+
+    function videoEnded() {
+        document.getElementById("completeBtn").style.display = "inline-block";
+    }
+
+    // Popup after quiz submission
+    @if (TempData["QuizResult"] != null)
+    {
+        <text>
+            var result = '@TempData["QuizResult"]';
+            var message = result === "pass" 
+                ? "🎉 Congratulations! You passed the quiz!" 
+                : "❌ You did not pass the quiz. Click 'Retake Quiz' to try again.";
+            alert(message);
+        </text>
+    }
+</script>
+}
+

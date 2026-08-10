@@ -1,8 +1,220 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Shekho.ViewModels.CourseBrowsingViewModel
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    /* Page background */
+    .browse-wrapper {
+        background: #f4f6f9;
+        padding: 2rem;
+        border-radius: 1rem;
+    }
+
+    /* Card container */
+    .filter-card,
+    .course-card {
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        border: none;
+        background-color: #ffffff; /* Card shell */
+        overflow: hidden;
+    }
+
+    /* 🔥 FORCE card-body color */
+    .filter-card .card-body,
+    .course-card .card-body {
+        background-color: #f1f5f9 !important; /* <-- THIS WILL SHOW */
+    }
+
+    /* Course card hover */
+    .course-card {
+        transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .course-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 35px rgba(0,0,0,0.15);
+    }
+
+    /* Course image */
+    .course-img {
+        height: 180px;
+        object-fit: cover;
+    }
+
+    /* Badge sizing */
+    .badge-level {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
+    }
+</style>
+
+<div class="browse-wrapper">
+
+    <h2 class="fw-semibold mb-4">
+        <i class="bi bi-search me-2"></i> Browse Courses
+    </h2>
+
+    <!-- FILTER CARD -->
+    <div class="card filter-card mb-4">
+        <div class="card-body">
+            <form method="get">
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" id="categorySelect" name="categoryId">
+                            <option value="">All Categories</option>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <option value="@cat.CategoryId"
+                                        selected="@(Model.SelectedCategoryId == cat.CategoryId)">
+                                    @cat.CategoryName
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Subcategory</label>
+                        <select class="form-select" id="subCategorySelect" name="subCategoryId">
+                            <option value="">All SubCategories</option>
+                            @foreach (var sub in Model.SubCategories)
+                            {
+                                <option value="@sub.SubCategoryId"
+                                        selected="@(Model.SelectedSubCategoryId == sub.SubCategoryId)">
+                                    @sub.SubCategoryName
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Level</label>
+                        <select class="form-select" name="difficulty">
+                            <option value="">All Levels</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advance">Advanced</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Search</label>
+                        <input class="form-control"
+                               name="searchTerm"
+                               placeholder="Search courses..."
+                               value="@Model.SearchTerm" />
+                    </div>
+
+                    <div class="col-md-1 d-grid">
+                        <button class="btn btn-primary">
+                            <i class="bi bi-funnel"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- COURSES -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+
+        @foreach (var course in Model.Courses)
+        {
+            bool isEnrolled = Model.EnrolledCourseIds.Contains(course.CourseId);
+
+            <div class="col">
+                <div class="card course-card h-100">
+
+                    <img src="@course.ThumbnailPath"
+                         class="course-img"
+                         alt="@course.CourseTitle" />
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="fw-semibold mb-1">@course.CourseTitle</h5>
+
+                        <small class="text-muted mb-2">
+                            @course.Category?.CategoryName /
+                            @course.SubCategory?.SubCategoryName
+                        </small>
+
+                        <div class="mb-3">
+                            <span class="badge bg-info badge-level">
+                                @course.DifficultyLevel
+                            </span>
+
+                            @if (course.IsFree)
+                            {
+                                <span class="badge bg-success ms-1">Free</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark ms-1">
+                                    ৳@course.CoursePrice
+                                </span>
+                            }
+                        </div>
+
+                        <div class="mt-auto d-flex justify-content-between">
+
+                            <a asp-area=""
+                               asp-controller="Home"
+                               asp-action="Details"
+                               asp-route-id="@course.CourseId"
+                               class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+
+                           @if (!User.Identity!.IsAuthenticated)
+                    {
+                         <a asp-area="Identity" asp-controller="Account" asp-action="Login" class="btn btn-secondary">
+                         Login to Enroll
+                    </a>
+                    }
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
 </div>
+
+@section Scripts {
+<script>
+    const categorySelect = document.getElementById("categorySelect");
+    const subSelect = document.getElementById("subCategorySelect");
+
+    function loadSubCategories(categoryId, selectedSubCategoryId = null) {
+        subSelect.innerHTML = '<option value="">All SubCategories</option>';
+
+        if (!categoryId) return;
+
+        fetch(`Home/GetByCategory?categoryId=${categoryId}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(sub => {
+                    const option = document.createElement("option");
+                    option.value = sub.subCategoryId;
+                    option.textContent = sub.subCategoryName;
+
+                    if (selectedSubCategoryId == sub.subCategoryId) {
+                        option.selected = true;
+                    }
+
+                    subSelect.appendChild(option);
+                });
+            });
+    }
+
+    categorySelect.addEventListener("change", function () {
+        loadSubCategories(this.value);
+    });
+</script>
+}

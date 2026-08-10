@@ -1,89 +1,203 @@
-﻿@{
+﻿@model IEnumerable<InstructorCourseViewModel>
+
+@{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
 
-<a asp-action="CreateCourse"
-   class="btn btn-primary mb-3">
-    + Add Course
-</a>
-<a asp-action="Index" asp-area="InstructorArea" asp-controller="CourseCategory"
-   class="btn btn-primary mb-3">
-    View Categories
-</a>
+<style>
+    /* Card wrapper for table */
+    .table-card {
+        border-radius: 1rem;
+        background: #ffffff;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Thumbnail</th>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Published</th> <!-- New column -->
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var course in Model)
-        {
+    .table thead th {
+        background-color: #28a745;
+        color: #fff;
+        font-weight: 600;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f1fef2;
+    }
+
+    .img-thumbnail {
+        border-radius: 0.5rem;
+    }
+
+    .btn {
+        font-size: 0.875rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.4rem;
+    }
+
+    .action-buttons .btn {
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.45em 0.65em;
+    }
+
+    .completed-notice {
+        display: inline-block;
+        background-color: #28a745;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 5px;
+        font-weight: 500;
+        font-family: Arial, sans-serif;
+        font-size: 0.875rem;
+    }
+</style>
+
+<div class="top-buttons mb-3">
+    <a asp-action="CreateCourse" class="btn btn-primary">+ Add Course</a>
+</div>
+
+<div class="table-card">
+    <table class="table table-bordered align-middle">
+        <thead>
             <tr>
-                <td>
-                    <img src="@course.ThumbnailPath"
-                         width="80"
-                         class="img-thumbnail" />
-                </td>
-                <td>@course.CourseTitle</td>
-                <td>
-                    @(course.IsFree ? "Free" : "$" + course.CoursePrice)
-                </td>
-                <td>
-                    @if (course.IsApproved)
-                    {
-                        <span class="badge bg-success">Approved</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning">Pending</span>
-                    }
-                </td>
-
-                <!-- Published column -->
-                <td>
-                    @if (course.IsPublished)
-                    {
-                        <span class="badge bg-success">Published</span>
-                    }
-                    else
-                    {
-                        <form asp-action="PublishCourse" method="post" class="d-inline">
-                            <input type="hidden" name="id" value="@course.CourseId" />
-                            <button type="submit" class="btn btn-sm btn-primary">Publish</button>
-                        </form>
-                    }
-                </td>
-
-                <td>
-                    <a asp-area="InstructorArea"
-                       asp-controller="Module"
-                       asp-action="Index"
-                       asp-route-courseId="@course.CourseId"
-                       class="btn btn-sm btn-info me-2">
-                        Sections
-                    </a>
-
-                    <a asp-action="EditCourse"
-                       asp-route-id="@course.CourseId"
-                       class="btn btn-sm btn-warning me-2">
-                        Edit
-                    </a>
-
-                    <a asp-action="Delete"
-                       asp-route-id="@course.CourseId"
-                       class="btn btn-sm btn-danger"
-                       onclick="return confirm('Are you sure you want to delete this course?');">
-                        Delete
-                    </a>
-                </td>
+                <th>Thumbnail</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Published</th>
+                <th>Actions</th>
+                <th>Completion Status</th>
+                <th>Final Quiz</th> <!-- NEW COLUMN -->
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+@foreach (var item in Model)
+{
+    var course = item.Course;
+
+    <tr>
+        <!-- Thumbnail -->
+        <td class="text-center">
+            <img src="@course.ThumbnailPath" width="80" class="img-thumbnail" />
+        </td>
+
+        <!-- Title -->
+        <td>@course.CourseTitle</td>
+
+        <!-- Price -->
+        <td>@(course.IsFree ? "Free" : "৳" + course.CoursePrice)</td>
+
+        <!-- Status -->
+        <td class="text-center">
+            @if (course.IsApproved)
+            {
+                <span class="badge bg-success">Approved</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark">Pending</span>
+            }
+        </td>
+
+        <!-- Published -->
+        <td class="text-center">
+            @if (course.IsPublished)
+            {
+                <span class="badge bg-success">Published</span>
+            }
+            else
+            {
+                <form asp-action="PublishCourse" method="post" class="d-inline">
+                    <input type="hidden" name="id" value="@course.CourseId" />
+                    <button type="submit" class="btn btn-sm btn-primary">Publish</button>
+                </form>
+            }
+        </td>
+
+        <!-- Actions -->
+        <td class="text-center action-buttons">
+            @if (!course.IsCompleted)
+            {
+                <a asp-area="InstructorArea"
+                   asp-controller="Module"
+                   asp-action="Index"
+                   asp-route-courseId="@course.CourseId"
+                   class="btn btn-sm btn-info">Sections</a>
+
+                <a asp-action="EditCourse"
+                   asp-route-id="@course.CourseId"
+                   class="btn btn-sm btn-warning">Edit</a>
+
+                <a asp-action="Delete"
+                   asp-route-id="@course.CourseId"
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('Are you sure?');">Delete</a>
+            }
+            else
+            {
+                <span class="completed-notice">Cannot edit after completion</span>
+            }
+        </td>
+
+        <!-- Completion Status -->
+        <td class="text-center">
+            @if (course.IsCompleted)
+            {
+                <span class="completed-notice">Completed</span>
+            }
+            else
+            {
+                <form asp-action="MarkCompleted" method="post">
+                    <input type="hidden" name="id" value="@course.CourseId" />
+                    <button type="submit" class="btn btn-sm btn-success"
+                            onclick="return confirm('Mark this course as completed?')">
+                        Mark Completed
+                    </button>
+                </form>
+            }
+        </td>
+
+        <!-- Final Quiz -->
+        <td class="text-center">
+            @if (course.IsCompleted)
+            {
+                if (!item.HasQuiz)
+                {
+                    <a asp-area="InstructorArea"
+                       asp-controller="Quiz"
+                       asp-action="Create"
+                       asp-route-courseId="@course.CourseId"
+                       class="btn btn-sm btn-success">
+                        Create Final Quiz
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="InstructorArea"
+                       asp-controller="Quiz"
+                       asp-action="Edit"
+                       asp-route-courseId="@course.CourseId"
+                       class="btn btn-sm btn-warning">
+                        Edit Final Quiz
+                    </a>
+                }
+            }
+            else
+            {
+                <span class="badge bg-secondary text-white" style="font-size:0.85rem; padding:0.4rem 0.6rem;">
+                Complete course first to add quiz
+                </span>
+
+            }
+        </td>
+    </tr>
+}
+        </tbody>
+    </table>
+</div>

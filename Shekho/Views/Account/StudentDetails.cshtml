@@ -1,0 +1,139 @@
+﻿@model Shekho.Models.StudentProfile
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h3 class="mb-4 text-center">
+    @(Model.StudentProfileId == 0 ? "Create Student Profile" : "Edit Student Profile")
+</h3>
+
+<style>
+    /* === Form Card Styling === */
+    .profile-card {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        max-width: 650px;
+        margin: auto;
+        transition: all 0.3s ease;
+    }
+    .profile-card:hover {
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    /* === Input Focus === */
+    .profile-card input.form-control,
+    .profile-card textarea.form-control,
+    .profile-card select.form-control {
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .profile-card input.form-control:focus,
+    .profile-card textarea.form-control:focus {
+        border-color: #1abc9c;
+        box-shadow: 0 0 8px rgba(26, 188, 156, 0.2);
+        outline: none;
+    }
+
+    /* === Labels === */
+    .profile-card label {
+        font-weight: 600;
+        color: #34495e;
+    }
+
+    /* === Buttons === */
+    .profile-card .btn-primary {
+        background: #1abc9c;
+        border: none;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: background 0.3s;
+    }
+    .profile-card .btn-primary:hover {
+        background: #16a085;
+    }
+
+    .profile-card .btn-success {
+        border-radius: 8px;
+        font-weight: 600;
+        background: #3498db;
+        border: none;
+        transition: background 0.3s;
+    }
+    .profile-card .btn-success:hover {
+        background: #2980b9;
+    }
+
+    /* === Profile Image Preview === */
+    .profile-card img.img-thumbnail {
+        display: block;
+        margin-top: 0.5rem;
+        border-radius: 8px;
+    }
+</style>
+
+<div class="profile-card">
+    <form asp-action="StudentDetails" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="UserId" />
+        @if(Model.StudentProfileId != 0)
+        {
+            <input type="hidden" asp-for="StudentProfileId" />
+        }
+
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Address" class="form-label"></label>
+            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CurrentInstitution" class="form-label"></label>
+            <input asp-for="CurrentInstitution" class="form-control" />
+            <span asp-validation-for="CurrentInstitution" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ProfilePicturePath" class="form-label">Profile Picture</label>
+            <input asp-for="ProfilePicturePath" type="file" class="form-control" />
+            @if (!string.IsNullOrEmpty(Model.ProfilePicturePath))
+            {
+                <img src="@Model.ProfilePicturePath" alt="Profile Picture" class="img-thumbnail" width="120" />
+            }
+            <span asp-validation-for="ProfilePicturePath" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1">
+                @(Model.StudentProfileId == 0 ? "Create" : "Update")
+            </button>
+
+            @if (Model.StudentProfileId == 0)
+            {
+                <a asp-area="StudentArea"
+                   asp-controller="Course"
+                   asp-action="Index"
+                   class="btn btn-success flex-grow-1 text-center">
+                   Skip for Now
+                </a>
+            }
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

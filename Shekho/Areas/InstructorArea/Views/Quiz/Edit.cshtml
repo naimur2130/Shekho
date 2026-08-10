@@ -1,0 +1,273 @@
+﻿@model CreateQuizViewModel
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+    ViewData["Title"] = "Edit Final Quiz";
+}
+
+<style>
+    /* Page wrapper */
+    .quiz-wrapper {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 1rem;
+    }
+
+    /* Step section for adding new questions */
+    .quiz-step-card {
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Question cards */
+    .quiz-item {
+        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        background: #fdfcfe; /* Light soft background for body */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .quiz-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    }
+
+    /* Card header with soft gradient */
+    .quiz-item .card-header {
+        background: linear-gradient(135deg, #d8b4ff, #b5bfff); /* soft violet → pastel blue */
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.05rem;
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Card body padding and spacing */
+    .quiz-item .card-body {
+        padding: 1.5rem;
+        background-color: #f7f6ff; /* subtle pastel background */
+        border-bottom-left-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+    }
+
+    /* Inputs & selects */
+    .quiz-item input.form-control,
+    .quiz-item select.form-select {
+        border-radius: 0.5rem;
+    }
+
+    /* Delete button in header */
+    .quiz-item .btn-danger {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.7rem;
+    }
+
+    /* Action buttons */
+    .btn-save {
+        border-radius: 0.7rem;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="quiz-wrapper">
+
+    <h2 class="mb-4">✏️ Edit Final Quiz</h2>
+
+    <!-- STEP 1: Add multiple questions -->
+    <div class="quiz-step-card">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                    Number of new questions to add
+                </label>
+                <input type="number"
+                       id="newQuizCount"
+                       class="form-control"
+                       min="1"
+                       placeholder="e.g. 5" />
+            </div>
+            <div class="col-md-4">
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        onclick="addMultipleQuizzes()">
+                    Generate Questions
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EXISTING + NEW QUIZZES ===== -->
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="CourseId" />
+        <div id="quizContainer">
+
+            @for (int i = 0; i < Model.Quizzes.Count; i++)
+            {
+                <div class="card mb-4 quiz-item">
+
+                    <div class="card-header">
+                        <strong>Question @(i + 1)</strong>
+                        <button type="button"
+                                class="btn btn-sm btn-danger"
+                                onclick="removeQuiz(this)">
+                            Delete
+                        </button>
+                    </div>
+
+                    <div class="card-body">
+                        <input type="hidden" name="Quizzes[@i].QuizId"
+                               value="@Model.Quizzes[i].QuizId" />
+                        <input type="hidden" name="Quizzes[@i].CourseId"
+                               value="@Model.CourseId" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Question</label>
+                            <input class="form-control"
+                                   name="Quizzes[@i].Question"
+                                   value="@Model.Quizzes[i].Question"
+                                   required />
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <label>Option A</label>
+                                <input class="form-control"
+                                       name="Quizzes[@i].OptionA"
+                                       value="@Model.Quizzes[i].OptionA"
+                                       required />
+                            </div>
+                            <div class="col-md-6">
+                                <label>Option B</label>
+                                <input class="form-control"
+                                       name="Quizzes[@i].OptionB"
+                                       value="@Model.Quizzes[i].OptionB"
+                                       required />
+                            </div>
+                            <div class="col-md-6">
+                                <label>Option C</label>
+                                <input class="form-control"
+                                       name="Quizzes[@i].OptionC"
+                                       value="@Model.Quizzes[i].OptionC"
+                                       required />
+                            </div>
+                            <div class="col-md-6">
+                                <label>Option D</label>
+                                <input class="form-control"
+                                       name="Quizzes[@i].OptionD"
+                                       value="@Model.Quizzes[i].OptionD"
+                                       required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Correct Answer</label>
+                            <select class="form-select"
+                                    name="Quizzes[@i].CorrectAnswer"
+                                    required>
+                                <option value="">-- Select --</option>
+                                <option value="A" selected="@(Model.Quizzes[i].CorrectAnswer == "A")">A</option>
+                                <option value="B" selected="@(Model.Quizzes[i].CorrectAnswer == "B")">B</option>
+                                <option value="C" selected="@(Model.Quizzes[i].CorrectAnswer == "C")">C</option>
+                                <option value="D" selected="@(Model.Quizzes[i].CorrectAnswer == "D")">D</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success btn-save">
+                Save Changes
+            </button>
+            <a asp-action="Index"
+               asp-controller="Course"
+               asp-area="InstructorArea"
+               class="btn btn-secondary ms-2">
+                Back
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+    let quizIndex = @Model.Quizzes.Count;
+
+    function addMultipleQuizzes() {
+        const countInput = document.getElementById("newQuizCount");
+        const count = parseInt(countInput.value);
+        if (!count || count <= 0) {
+            alert("Please enter a valid number of questions.");
+            return;
+        }
+        for (let i = 0; i < count; i++) addSingleQuiz();
+        countInput.value = "";
+    }
+
+    function addSingleQuiz() {
+        const container = document.getElementById("quizContainer");
+        const html = `
+        <div class="card mb-4 quiz-item">
+            <div class="card-header">
+                <strong>New Question</strong>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeQuiz(this)">Delete</button>
+            </div>
+            <div class="card-body">
+                <input type="hidden" name="Quizzes[${quizIndex}].QuizId" value="0" />
+                <input type="hidden" name="Quizzes[${quizIndex}].CourseId" value="@Model.CourseId" />
+
+                <div class="mb-3">
+                    <label>Question</label>
+                    <input class="form-control" name="Quizzes[${quizIndex}].Question" required />
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label>Option A</label>
+                        <input class="form-control" name="Quizzes[${quizIndex}].OptionA" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Option B</label>
+                        <input class="form-control" name="Quizzes[${quizIndex}].OptionB" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Option C</label>
+                        <input class="form-control" name="Quizzes[${quizIndex}].OptionC" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Option D</label>
+                        <input class="form-control" name="Quizzes[${quizIndex}].OptionD" required />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label>Correct Answer</label>
+                    <select class="form-select" name="Quizzes[${quizIndex}].CorrectAnswer" required>
+                        <option value="">-- Select --</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                    </select>
+                </div>
+            </div>
+        </div>`;
+        container.insertAdjacentHTML("beforeend", html);
+        quizIndex++;
+    }
+
+    function removeQuiz(btn) {
+        btn.closest(".quiz-item").remove();
+    }
+</script>
+}

@@ -10,7 +10,7 @@ namespace Shekho.Models
         public int LessonId { get; set; }
         public string LessonTitle { get; set; }
         public string? VideoUrl { get; set; }
-        public string ResourcePath { get; set; }
+        public string? ResourcePath { get; set; }
         public int Order {  get; set; }
         public int CourseSectionId { get; set; }
         [ForeignKey("CourseSectionId")]

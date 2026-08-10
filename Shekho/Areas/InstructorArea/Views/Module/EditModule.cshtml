@@ -3,17 +3,74 @@
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
 
-<h2>Edit Section</h2>
+<style>
+    .card-edit-section {
+        background: #fff;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        max-width: 600px;
+        margin: 2rem auto;
+    }
 
-<form method="post">
-    <input type="hidden" asp-for="CourseSectionId" />
+    .card-edit-section:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.15);
+    }
 
-    <div class="mb-3">
-        <label class="form-label">Section Title</label>
-        <input asp-for="CourseSectionName" class="form-control" />
-    </div>
+    .card-edit-section h2 {
+        color: #17a2b8;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
 
-    <button type="submit" class="btn btn-success">
-        Update
-    </button>
-</form>
+    .form-label {
+        font-weight: 500;
+    }
+
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 6px rgba(40,167,69,0.3);
+    }
+
+    .btn-success {
+        transition: all 0.2s;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .btn-secondary:hover {
+        background-color: #6c757d;
+        border-color: #5c636a;
+    }
+</style>
+
+<div class="card card-edit-section">
+    <h2>Edit Section</h2>
+
+    <form method="post">
+        <input type="hidden" asp-for="CourseSectionId" />
+
+        <!-- Section Title -->
+        <div class="mb-3">
+            <label class="form-label">Section Title</label>
+            <input asp-for="CourseSectionName" class="form-control form-control-lg" placeholder="Enter section title" />
+            <span asp-validation-for="CourseSectionName" class="text-danger"></span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success px-4">Update</button>
+            <a asp-action="Index"
+               asp-route-courseId="@Model.CourseId"
+               class="btn btn-secondary px-4">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>

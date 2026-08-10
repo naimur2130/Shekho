@@ -1,30 +1,134 @@
-﻿<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-    <!--begin::Sidebar Brand-->
+﻿<aside class="app-sidebar shadow" data-bs-theme="dark">
+    <!-- Page-specific CSS -->
+    <style>
+        /* === Sidebar Base === */
+        .app-sidebar {
+            background-color: #1b1b1b; /* dark base */
+            color: #ddd;
+            width: 250px;
+            transition: all 0.3s ease;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        /* === Sidebar Brand === */
+        .sidebar-brand {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .sidebar-brand .brand-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #8A2BE2; /* violet */
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar-brand .brand-link:hover {
+            color: #1E90FF; /* blue hover */
+        }
+
+        .sidebar-brand img {
+            width: 40px;
+            height: 40px;
+            margin-right: 0.5rem;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(138, 43, 226, 0.5); /* subtle violet glow */
+        }
+
+        /* === Sidebar Menu === */
+        .sidebar-menu {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu .nav-item {
+            margin-bottom: 0.2rem;
+        }
+
+        .sidebar-menu .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            color: #ddd;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu .nav-link:hover {
+            background-color: #2a2a2a;
+            color: #1E90FF; /* blue hover for links */
+        }
+
+        .sidebar-menu .nav-link.active {
+            background-color: #8A2BE2; /* violet active */
+            color: #fff;
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.6);
+        }
+
+        .sidebar-menu .nav-icon {
+            margin-right: 0.7rem;
+            font-size: 1.1rem;
+            color: #8A2BE2; /* violet icons */
+        }
+
+        .sidebar-menu .nav-link.active .nav-icon {
+            color: #fff;
+        }
+
+        .sidebar-menu .nav-arrow {
+            margin-left: auto;
+            transition: transform 0.3s, color 0.3s;
+            color: #1E90FF;
+        }
+
+        .menu-open > .nav-link .nav-arrow {
+            transform: rotate(90deg);
+        }
+
+        /* === Submenu Styling === */
+        .nav-treeview {
+            padding-left: 1rem;
+            margin-top: 0.2rem;
+        }
+
+        .nav-treeview .nav-link {
+            background-color: #1C1C1C;
+            font-size: 0.95rem;
+            color: #ddd;
+        }
+
+        .nav-treeview .nav-link:hover {
+            background-color: #2a2a2a;
+            color: #1E90FF; /* blue hover */
+        }
+
+        .nav-treeview .nav-icon {
+            font-size: 0.9rem;
+            color: #1E90FF; /* blue for sub-icons */
+        }
+    </style>
+
+    <!-- Sidebar Brand -->
     <div class="sidebar-brand">
-        <!--begin::Brand Link-->
         <a href="../index.html" class="brand-link">
-            <!--begin::Brand Image-->
-            <img src="../../../dist/assets/img/AdminLTELogo.png"
-                 alt="AdminLTE Logo"
-                 class="brand-image opacity-75 shadow" />
-            <!--end::Brand Image-->
-            <!--begin::Brand Text-->
+            <img src="../../../dist/assets/img/AdminLTELogo.png" alt="Logo" class="brand-image opacity-75 shadow" />
             <span class="brand-text fw-light">SHEKHO</span>
-            <!--end::Brand Text-->
         </a>
-        <!--end::Brand Link-->
     </div>
-    <!--end::Sidebar Brand-->
-    <!--begin::Sidebar Wrapper-->
+
+    <!-- Sidebar Wrapper -->
     <div class="sidebar-wrapper">
         <nav class="mt-2">
-            <!--begin::Sidebar Menu-->
+            <!-- Admin Menu -->
             @if (User.IsInRole("Admin"))
             {
-                <ul class="nav sidebar-menu flex-column"
-                    data-lte-toggle="treeview"
-                    role="menu"
-                    data-accordion="false">
+                <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                     <li class="nav-item menu-open">
                         <a class="nav-link active">
                             <i class="nav-icon bi bi-speedometer"></i>
@@ -41,39 +145,38 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a asp-area="AdminArea" asp-controller="Admin" asp-action="Users" class="nav-link">
+                                    <i class="nav-icon bi bi-circle"></i>
+                                    <p>All Users</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a asp-area="AdminArea" asp-controller="AdminCourse" asp-action="Index" class="nav-link">
                                     <i class="nav-icon bi bi-circle"></i>
                                     <p>Pending Requests</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a asp-area="AdminArea" asp-controller="Category" asp-action="Index" class="nav-link">
+                                <a asp-area="AdminArea" asp-controller="Admin" asp-action="PendingInstructors" class="nav-link">
                                     <i class="nav-icon bi bi-circle"></i>
-                                    <p>Category</p>
+                                    <p>Pending Instructors</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a asp-area="AdminArea" asp-controller="Product" asp-action="Index" class="nav-link">
+                                <a asp-area="AdminArea" asp-controller="CourseCategory" asp-action="Index" class="nav-link">
                                     <i class="nav-icon bi bi-circle"></i>
-                                    <p>Product</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a asp-area="AdminArea" asp-controller="Admin" asp-action="ReturnRequest" class="nav-link">
-                                    <i class="nav-icon bi bi-circle"></i>
-                                    <p>Return Request</p>
+                                    <p>Manage Category</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
                 </ul>
             }
+
+            <!-- Instructor Menu -->
             @if (User.IsInRole("Instructor"))
             {
-                <ul class="nav sidebar-menu flex-column"
-                    data-lte-toggle="treeview"
-                    role="menu"
-                    data-accordion="false">
+                <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                     <li class="nav-item menu-open">
                         <a class="nav-link active">
                             <i class="nav-icon bi bi-speedometer"></i>
@@ -95,28 +198,16 @@
                                     <p>Create Courses</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a asp-controller="Category" asp-action="Index" class="nav-link">
-                                    <i class="nav-icon bi bi-circle"></i>
-                                    <p>Happy</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="./index3.html" class="nav-link">
-                                    <i class="nav-icon bi bi-circle"></i>
-                                    <p>Hello</p>
-                                </a>
-                            </li>
+                            
                         </ul>
                     </li>
                 </ul>
             }
+
+            <!-- Student Menu -->
             @if (User.IsInRole("Student"))
             {
-                <ul class="nav sidebar-menu flex-column"
-                    data-lte-toggle="treeview"
-                    role="menu"
-                    data-accordion="false">
+                <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                     <li class="nav-item menu-open">
                         <a class="nav-link active">
                             <i class="nav-icon bi bi-speedometer"></i>
@@ -132,15 +223,10 @@
                                     <p>My Courses</p>
                                 </a>
                             </li>
-                            
                         </ul>
                     </li>
                 </ul>
             }
-            <!--end::Sidebar Menu-->
         </nav>
     </div>
-    <!--end::Sidebar Wrapper-->
 </aside>
-
-

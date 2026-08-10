@@ -12,6 +12,9 @@ namespace Shekho.Models
         public int CourseId { get; set; }
 
         public DateTime EnrolledAt { get; set; } = DateTime.Now;
+        public decimal AmountPaid { get; set; }   
+        public decimal InstructorAmount { get; set; } 
+        public decimal AdminAmount { get; set; }
 
         public bool IsPaid { get; set; }
         public string? PaymentIntentId { get; set; }

@@ -3,17 +3,76 @@
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
 
+<style>
+    .delete-card {
+        background: #ffffff;
+        border-radius: 1rem;
+        padding: 2rem;
+        max-width: 600px;
+        margin: 3rem auto;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+    }
 
-<h2>Delete Lesson</h2>
+    .delete-icon {
+        font-size: 3rem;
+        color: #dc3545;
+        text-align: center;
+    }
 
-<div class="alert alert-danger">
-    Are you sure you want to delete this lesson?
+    .delete-card h2 {
+        text-align: center;
+        font-weight: 600;
+        margin-top: 0.5rem;
+        color: #dc3545;
+    }
+
+    .lesson-title {
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin: 1rem 0;
+        color: #343a40;
+    }
+
+    .alert-danger {
+        border-radius: 0.75rem;
+        font-size: 0.95rem;
+        margin-top: 1rem;
+    }
+
+    .btn-danger {
+        font-weight: 500;
+        padding: 0.6rem 1.4rem;
+    }
+</style>
+
+<div class="delete-card">
+    <div class="delete-icon">
+        <i class="bi bi-trash-fill"></i>
+    </div>
+
+    <h2>Delete Lesson</h2>
+
+    <div class="alert alert-danger text-center">
+        This action <strong>cannot be undone</strong>.
+        Are you sure you want to delete this lesson?
+    </div>
+
+    <p class="lesson-title">
+        <strong>@Model.LessonTitle</strong>
+    </p>
+
+    <form method="post" class="d-flex justify-content-center gap-3">
+        <input type="hidden" asp-for="LessonId" />
+
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i> Yes, Delete
+        </button>
+
+        <a asp-action="Index"
+           asp-route-moduleId="@Model.CourseSectionId"
+           class="btn btn-outline-secondary">
+            Cancel
+        </a>
+    </form>
 </div>
-
-<p><strong>@Model.LessonTitle</strong></p>
-
-<form method="post">
-    <input type="hidden" asp-for="LessonId" />
-
-    <button type="submit" class="btn btn-danger">Yes, Delete</button>
-</form>

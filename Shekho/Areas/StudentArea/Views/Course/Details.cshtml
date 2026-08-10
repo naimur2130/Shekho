@@ -1,73 +1,161 @@
-﻿@model Shekho.Models.Course
+﻿@model Shekho.ViewModels.CourseDetailsViewModel
 @{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
 
-<div class="container mt-4">
+<style>
+    /* Page wrapper */
+    .course-details-wrapper {
+        background: #f4f6f9;
+        padding: 2rem;
+        border-radius: 1rem;
+    }
 
-    <div class="row">
+    /* Card base */
+    .details-card {
+        border-radius: 1rem;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        overflow: hidden;
+        background-color: #ffffff;
+    }
+
+    /* 🔥 FORCE card-body color */
+    .details-card .card-body {
+        background-color: #f8fafc !important;
+    }
+
+    /* Section title */
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Lesson list */
+    .lesson-item {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 0.6rem 0.75rem;
+        margin-bottom: 0.4rem;
+        font-size: 0.9rem;
+    }
+
+    /* Sidebar price */
+    .price-box {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0d6efd;
+    }
+</style>
+
+<div class="course-details-wrapper">
+
+    <div class="row g-4">
+
+        <!-- LEFT CONTENT -->
         <div class="col-md-8">
-            <h2>@Model.CourseTitle</h2>
+            <div class="card details-card">
+                <div class="card-body">
 
-            <p class="text-muted">
-                @Model.Category?.CategoryName /
-                @Model.SubCategory?.SubCategoryName
-            </p>
+                    <h2 class="fw-semibold mb-1">
+                        @Model.Course.CourseTitle
+                    </h2>
 
-            <p>
-                <strong>Difficulty:</strong> @Model.DifficultyLevel
-            </p>
+                    <p class="text-muted mb-2">
+                        @Model.Course.Category?.CategoryName /
+                        @Model.Course.SubCategory?.SubCategoryName
+                    </p>
 
-            <p>
-                <strong>Price:</strong>
-                @(Model.IsFree ? "Free" : "$" + Model.CoursePrice)
-            </p>
+                    <div class="mb-3">
+                        <span class="badge bg-info me-2">
+                            @Model.Course.DifficultyLevel
+                        </span>
 
-            <hr />
-
-            <h5>Description</h5>
-            <p>@Model.CourseDescription</p>
-
-            <hr />
-
-            <h5>Course Content</h5>
-
-            @foreach (var sec in Model.courseSections.OrderBy(s => s.Order))
-            {
-                <div class="mb-3">
-                    <h6>@sec.CourseSectionName</h6>
-
-                    <ul class="list-group">
-                        @foreach (var lesson in sec.Lesson.OrderBy(l => l.Order))
+                        @if (Model.Course.IsFree)
                         {
-                            <li class="list-group-item">
-                                🔒 @lesson.LessonTitle
-                            </li>
+                            <span class="badge bg-success">Free</span>
                         }
-                    </ul>
-                </div>
-            }
-        </div>
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">
+                                ৳@Model.Course.CoursePrice
+                            </span>
+                        }
+                    </div>
 
-        <div class="col-md-4">
-            <div class="card">
-                <img src="@Model.ThumbnailPath" class="card-img-top" />
+                    <hr />
 
-                <div class="card-body text-center">
-                    <h4>
-                        @(Model.IsFree ? "Free" : "$" + Model.CoursePrice)
-                    </h4>
+                    <h5 class="section-title">Description</h5>
+                    <p class="text-secondary">
+                        @Model.Course.CourseDescription
+                    </p>
 
-                    <a asp-area="StudentArea"
-                       asp-controller="Enrollment"
-                       asp-action="Enroll"
-                       asp-route-courseId="@Model.CourseId"
-                       class="btn btn-success w-100 mt-2">
-                        Enroll Now
-                    </a>
+                    <hr />
+
+                    <h5 class="section-title">Course Content</h5>
+
+                    @foreach (var sec in Model.Course.courseSections.OrderBy(s => s.Order))
+                    {
+                        <div class="mb-3">
+                            <h6 class="fw-semibold">
+                                @sec.CourseSectionName
+                            </h6>
+
+                            @foreach (var lesson in sec.Lesson.OrderBy(l => l.Order))
+                            {
+                                <div class="lesson-item">
+                                    🔒 @lesson.LessonTitle
+                                </div>
+                            }
+                        </div>
+                    }
+
                 </div>
             </div>
         </div>
-    </div>
 
+        <!-- RIGHT SIDEBAR -->
+        <div class="col-md-4">
+            <div class="card details-card">
+
+                <img src="@Model.Course.ThumbnailPath"
+                     class="img-fluid"
+                     alt="@Model.Course.CourseTitle" />
+
+                <div class="card-body text-center">
+
+                    <div class="price-box mb-3">
+                        @(Model.Course.IsFree ? "Free" : "৳" + Model.Course.CoursePrice)
+                    </div>
+
+                    @if (Model.IsEnrolled)
+                    {
+                        <span class="badge bg-success px-4 py-2">
+                            Enrolled
+                        </span>
+                        <a asp-area="StudentArea"
+                                   asp-controller="Learning"
+                                   asp-action="CourseLearn"
+                                   asp-route-courseId="@Model.Course.CourseId"
+                                   class="btn btn-sm btn-primary">
+                                    Continue
+                                </a>
+                    }
+                    else
+                    {
+                        <a asp-area="StudentArea"
+                           asp-controller="Enrollment"
+                           asp-action="Enroll"
+                           asp-route-courseId="@Model.Course.CourseId"
+                           class="btn btn-success w-100">
+                            Enroll Now
+                        </a>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>

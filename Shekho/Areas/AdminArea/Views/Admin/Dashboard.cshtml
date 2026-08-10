@@ -1,0 +1,114 @@
+﻿@model AdminAnalyticsViewModel
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h3 class="mb-4 text-center">📊 Platform Analytics</h3>
+
+<style>
+    /* === Card Styling === */
+    .analytics-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s, box-shadow 0.3s;
+        color: #fff;
+    }
+    .analytics-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .analytics-card h6 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .analytics-card h3, .analytics-card h4 {
+        font-weight: bold;
+        margin: 0;
+    }
+
+    /* === Gradient Backgrounds === */
+    .bg-courses {
+        background: linear-gradient(135deg, #1abc9c, #16a085);
+    }
+    .bg-enrollments {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+    }
+    .bg-revenue {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    }
+    .bg-admin {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+    }
+    .bg-instructor {
+        background: linear-gradient(135deg, #f39c12, #d35400);
+    }
+
+    /* === Card Body Centering === */
+    .analytics-card .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 120px;
+    }
+
+    /* === Responsive Margins === */
+    .analytics-card + .analytics-card {
+        margin-top: 1rem;
+    }
+
+    
+</style>
+
+<div class="row g-3">
+
+    <div class="col-md-4">
+        <div class="card analytics-card bg-courses">
+            <div class="card-body text-center">
+                <h6>Total Courses</h6>
+                <h3>@Model.TotalCourses</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card analytics-card bg-enrollments">
+            <div class="card-body text-center">
+                <h6>Total Enrollments</h6>
+                <h3>@Model.TotalEnrollments</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card analytics-card bg-revenue">
+            <div class="card-body text-center">
+                <h6>Total Revenue</h6>
+                <h3>৳ @Model.TotalRevenue</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-3 mt-4">
+
+    <div class="col-md-6">
+        <div class="card analytics-card bg-admin">
+            <div class="card-body text-center">
+                <h6>Admin Revenue (30%)</h6>
+                <h4>৳ @Model.AdminRevenue</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card analytics-card bg-instructor">
+            <div class="card-body text-center">
+                <h6>Instructor Revenue (70%)</h6>
+                <h4>৳ @Model.InstructorRevenue</h4>
+            </div>
+        </div>
+    </div>
+
+</div>

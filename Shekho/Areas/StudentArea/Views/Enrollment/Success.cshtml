@@ -1,13 +1,58 @@
 ﻿@{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
-<h2>Enrollment Successful 🎉</h2>
 
-<p>You are now enrolled in this course.</p>
+<style>
+    .success-wrapper {
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-<a asp-area="StudentArea"
-   asp-controller="Course"
-   asp-action="Index"
-   class="btn btn-primary">
-    Go to My Courses
-</a>
+    .success-card {
+        max-width: 420px;
+        width: 100%;
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        background-color: #ffffff;
+    }
+
+    .success-card .card-body {
+        background-color: #f8fafc;
+        border-radius: 1rem;
+    }
+
+    .success-icon {
+        font-size: 3rem;
+        color: #28a745;
+    }
+</style>
+
+<div class="success-wrapper">
+    <div class="card success-card">
+        <div class="card-body text-center p-4">
+
+            <div class="success-icon mb-3">
+                🎉
+            </div>
+
+            <h3 class="fw-semibold mb-2">
+                Enrollment Successful!
+            </h3>
+
+            <p class="text-muted mb-4">
+                You are now enrolled in this course and can start learning right away.
+            </p>
+
+            <a asp-area="StudentArea"
+               asp-controller="Course"
+               asp-action="Index"
+               class="btn btn-success w-100">
+                Go to My Courses
+            </a>
+
+        </div>
+    </div>
+</div>

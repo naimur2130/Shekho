@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 
 namespace Shekho.Models
 {
@@ -18,12 +19,14 @@ namespace Shekho.Models
         public int CourseId { get; set; }
         [Required]
         public string CourseTitle { get; set; }
+        [Required]
         public string CourseDescription { get; set; }
-        public decimal CoursePrice { get; set; }
+        public decimal? CoursePrice { get; set; }
         public bool IsFree { get; set; }
         public string? ThumbnailPath { get; set; }
         public bool IsApproved { get; set; }
         public bool IsPublished { get; set; }
+        public bool IsCompleted { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string? InstructorId { get; set; }
         public int? CategoryId { get; set; }

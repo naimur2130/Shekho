@@ -17,6 +17,11 @@ namespace Shekho.Data
         public DbSet<CourseCategory> CourseCategory { get; set; }
         public DbSet<CourseSubCategory> CourseSubCategory { get; set; }
         public DbSet<Enrollment> Enrollment { get; set; }
+        public DbSet<LessonProgress> LessonProgress { get; set; }
+        public DbSet<InstructorProfile> instructorProfile { get; set; }
+        public DbSet<StudentProfile> studentProfile { get; set; }
+        public DbSet<StudentQuizAnswer> StudentQuizAnswer { get; set; }
+        public DbSet<QuizAttempt> QuizAttempt { get; set; }
 
     }
 }

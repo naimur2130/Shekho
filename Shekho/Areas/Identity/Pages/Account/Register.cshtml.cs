@@ -89,37 +89,39 @@ namespace Shekho.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
                 var user = new IdentityUser { UserName = Input.Email, Email = Input.Email };
                 var result = await _userManager.CreateAsync(user, Input.Password);
-                if (result.Succeeded)
 
+                if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
                     await _userManager.AddToRoleAsync(user, Input.Role);
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    if (Input.Role == "Admin")
-                    {
-                        return RedirectToAction("Index", "Admin", new { area = "AdminArea" });
-                    }
                     if (Input.Role == "Instructor")
                     {
-                        return RedirectToAction("Index", "Instructor", new { area = "InstructorArea" });
+                        return RedirectToAction("InstructorDetails", "Account", new { area = "", userId = user.Id });
                     }
+
+                    await _signInManager.SignInAsync(user, isPersistent: false);
                     if (Input.Role == "Student")
                     {
-                        return RedirectToAction("Index", "Student", new { area = "StudentArea" });
+                        return RedirectToAction("StudentDetails", "Account", new { area = "", userId = user.Id });
                     }
+
+                    if (Input.Role == "Admin")
+                        return RedirectToAction("Index", "Admin", new { area = "AdminArea" });
+
                 }
                 foreach (var error in result.Errors)
-                {
                     ModelState.AddModelError(string.Empty, error.Description);
-                }
             }
+
             return Page();
         }
+
     }
 }
 

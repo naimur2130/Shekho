@@ -2,31 +2,84 @@
 @{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
-<h2>Add Lesson</h2>
 
-<form method="post" enctype="multipart/form-data">
-    <input type="hidden" name="moduleId" value="@ViewBag.CourseSectionId" />
+<style>
+    .lesson-card {
+        background: #fff;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+        max-width: 700px;
+        margin: 2rem auto;
+    }
 
-    <div class="mb-3">
-        <label>Title</label>
-        <input asp-for="LessonTitle" class="form-control" />
-    </div>
+    .lesson-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.12);
+    }
 
-    <div class="mb-3">
-        <label>Video URL (YouTube)</label>
-        <input asp-for="VideoUrl" class="form-control" />
-    </div>
+    .lesson-card h2 {
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        color: #343a40;
+        text-align: center;
+    }
 
-    <div class="mb-3">
-        <label>Resource (PDF / DOC)</label>
-        <input type="file" name="resource" class="form-control" />
-    </div>
+    .form-label {
+        font-weight: 500;
+    }
 
-    @* <div class="mb-3">
-        <input asp-for="IsPreview" /> Free Preview
-    </div> *@
+    .form-control:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 6px rgba(40,167,69,0.3);
+    }
 
-    <button type="submit" class="btn btn-success">Save</button>
-</form>
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
 
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+</style>
 
+<div class="lesson-card">
+    <h2>Add Lesson</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="moduleId" value="@ViewBag.CourseSectionId" />
+
+        <div class="mb-3">
+            <label class="form-label">Lesson Title</label>
+            <input asp-for="LessonTitle" class="form-control form-control-lg" placeholder="Enter lesson title" />
+            <span asp-validation-for="LessonTitle" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Video URL (Optional)</label>
+            <input asp-for="VideoUrl" class="form-control form-control-lg" placeholder="Paste YouTube link here" />
+            <span asp-validation-for="VideoUrl" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Resource</label>
+            <input type="file" name="resource" class="form-control form-control-lg" />
+        </div>
+
+        @* Optional: Free Preview
+        <div class="form-check mb-3">
+            <input asp-for="IsPreview" class="form-check-input" id="IsPreview" />
+            <label class="form-check-label" for="IsPreview">Free Preview</label>
+        </div>
+        *@
+
+        <button type="submit" class="btn btn-success w-100">
+            <i class="bi bi-save me-2"></i> Save Lesson
+        </button>
+    </form>
+</div>

@@ -1,0 +1,152 @@
+﻿@model AdminUsersPageViewModel
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<h3 class="mb-4 text-center">🎓 Students</h3>
+
+<style>
+    /* === Card Container for Tables === */
+    .table-card {
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        overflow-x: auto;
+        margin-bottom: 2rem;
+    }
+
+    /* === Table Styling === */
+    .table-card table {
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+        width: 100%;
+    }
+    .table-card thead tr {
+        background: #1abc9c;
+        color: #fff;
+        border-radius: 12px;
+    }
+    .table-card th, .table-card td {
+        vertical-align: middle;
+        text-align: center;
+    }
+    .table-card tbody tr {
+        background: #f4f7f9;
+        border-radius: 8px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .table-card tbody tr:hover {
+        background: #e0f7f1;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    /* === Buttons === */
+    .table-card .btn-success {
+        border-radius: 6px;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+    .table-card .btn-success:hover {
+        background: #16a085;
+    }
+    .table-card .btn-danger {
+        border-radius: 6px;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+    .table-card .btn-danger:hover {
+        background: #c0392b;
+    }
+</style>
+
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Phone</th>
+                <th>Institution</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Students)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.FullName</td>
+                    <td>@user.PhoneNumber</td>
+                    <td>@user.CurrentInstitution</td>
+                    <td>@(user.IsBlocked ? "Blocked" : "Active")</td>
+                    <td>
+                        @if (user.IsBlocked)
+                        {
+                            <form asp-action="UnblockUser" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button class="btn btn-success btn-sm">Unblock</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="BlockUser" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button class="btn btn-danger btn-sm">Block</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<h3 class="mb-4 text-center">👨‍🏫 Instructors</h3>
+
+<div class="table-card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Phone</th>
+                <th>Qualification</th>
+                <th>Approved</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Instructors)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.FullName</td>
+                    <td>@user.PhoneNumber</td>
+                    <td>@user.Qualification</td>
+                    <td>@(user.IsApproved == true ? "Yes" : "No")</td>
+                    <td>@(user.IsBlocked ? "Blocked" : "Active")</td>
+                    <td>
+                        @if (user.IsBlocked)
+                        {
+                            <form asp-action="UnblockUser" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button class="btn btn-success btn-sm">Unblock</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="BlockUser" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button class="btn btn-danger btn-sm">Block</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

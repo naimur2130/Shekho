@@ -2,83 +2,167 @@
 @{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
-<h2>Edit Course</h2>
 
-<form asp-action="EditCourse" method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="CourseId" />
+<style>
+    /* Card container */
+    .card-edit-course {
+        border-radius: 1rem;
+        background: #ffffff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
 
-    <div class="mb-3">
-        <label class="form-label">Title</label>
-        <input asp-for="CourseTitle" class="form-control" />
-        <span asp-validation-for="CourseTitle" class="text-danger"></span>
+    .card-edit-course:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.15);
+    }
+
+    /* Card header */
+    .card-header-edit {
+        background: linear-gradient(90deg, #28a745, #218838);
+        color: #fff;
+        padding: 1rem 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    /* Card body padding */
+    .card-body-edit {
+        padding: 2rem;
+    }
+
+    /* Form labels */
+    .form-label {
+        font-weight: 500;
+    }
+
+    /* Form controls focus */
+    .form-control:focus, .form-select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+    }
+
+    /* Buttons */
+    .btn-success {
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .btn-secondary {
+        padding: 0.5rem 1rem;
+    }
+
+    /* Thumbnail */
+    .img-thumbnail {
+        border-radius: 0.5rem;
+        max-width: 180px;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Checkbox */
+    .form-check-input:checked {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+</style>
+
+<div class="card card-edit-course">
+    <div class="card-header-edit">
+        <i class="bi bi-pencil-square me-2"></i>Edit Course
     </div>
+    <div class="card-body-edit">
+        <form asp-action="EditCourse" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="CourseId" />
 
-    <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea asp-for="CourseDescription" class="form-control" rows="4"></textarea>
-    </div>
+            <!-- Title -->
+            <div class="mb-3">
+                <label class="form-label">Course Title</label>
+                <input asp-for="CourseTitle" class="form-control form-control-lg" placeholder="Enter course title" />
+                <span asp-validation-for="CourseTitle" class="text-danger"></span>
+            </div>
 
-    <div class="mb-3">
-        <label class="form-check-label">
-            <input asp-for="IsFree" class="form-check-input" />
-            Free Course
-        </label>
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea asp-for="CourseDescription" class="form-control form-control-lg" rows="4" placeholder="Course description"></textarea>
+            </div>
+
+            <!-- Free Course -->
+            <div class="form-check mb-3">
+                <input asp-for="IsFree" class="form-check-input" type="checkbox" id="IsFree" />
+                <label class="form-check-label" for="IsFree">Free Course</label>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select asp-for="CategoryId" class="form-select form-select-lg" id="CategoryId">
+                    <option value="">-- Select Category --</option>
+                    @foreach (var cat in ViewBag.Categories)
+                    {
+                        <option value="@cat.CategoryId">@cat.CategoryName</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Sub Category -->
+            <div class="mb-3">
+                <label class="form-label">Sub Category</label>
+                <select asp-for="SubCategoryId" class="form-select form-select-lg" id="SubCategoryId">
+                    <option value="">-- Select Sub Category --</option>
+                </select>
+            </div>
+
+            <!-- Difficulty Level -->
+            <div class="mb-3">
+                <label class="form-label">Difficulty Level</label>
+                <select asp-for="DifficultyLevel" class="form-select form-select-lg" asp-items="ViewBag.DifficultyLevels">
+                    <option value="">-- Select Difficulty Level --</option>
+                </select>
+                <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-3">
+                <label class="form-label">Price</label>
+                <input asp-for="CoursePrice" class="form-control form-control-lg" placeholder="Enter price" />
+            </div>
+
+            <!-- Current Thumbnail -->
+            <div class="mb-3">
+                <label class="form-label">Current Thumbnail</label><br />
+                @if (!string.IsNullOrEmpty(Model.ThumbnailPath))
+                {
+                    <img src="@Model.ThumbnailPath" class="img-thumbnail" />
+                }
+            </div>
+
+            <!-- Change Thumbnail -->
+            <div class="mb-4">
+                <label class="form-label">Change Thumbnail</label>
+                <input type="file" name="Thumbnail" class="form-control" />
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-save me-1"></i> Update Course
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
     </div>
-    <div class="mb-3">
-    <label class="form-label">Category</label>
-    <select asp-for="CategoryId" class="form-select" id="CategoryId">
-        <option value="">-- Select Category --</option>
-        @foreach (var cat in ViewBag.Categories)
-        {
-            <option value="@cat.CategoryId">
-                @cat.CategoryName
-            </option>
-        }
-    </select>
 </div>
-
-<div class="mb-3">
-    <label class="form-label">Sub Category</label>
-    <select asp-for="SubCategoryId" class="form-select" id="SubCategoryId">
-        <option value="">-- Select Sub Category --</option>
-    </select>
-</div>
-
-<div class="mb-3">
-    <label>Difficulty Level</label>
-    <select asp-for="DifficultyLevel" class="form-select" asp-items="ViewBag.DifficultyLevels">
-        <option value="">-- Select Difficulty Level --</option>
-    </select>
-    <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
-</div>
-    <div class="mb-3">
-        <label class="form-label">Price</label>
-        <input asp-for="CoursePrice" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Current Thumbnail</label><br />
-        @if (!string.IsNullOrEmpty(Model.ThumbnailPath))
-        {
-            <img src="@Model.ThumbnailPath"
-                 class="img-thumbnail mb-2"
-                 width="150" />
-        }
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Change Thumbnail</label>
-        <input type="file" name="Thumbnail" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-success">
-        Update Course
-    </button>
-
-    <a asp-action="Index" class="btn btn-secondary">
-        Cancel
-    </a>
-</form>
 
 @section Scripts {
 <script>
@@ -111,12 +195,12 @@
             });
     }
 
-    // ✅ Load subcategories on page load
+    // Load subcategories on page load
     if (selectedCategoryId) {
         loadSubCategories(selectedCategoryId, selectedSubCategoryId);
     }
 
-    // ✅ Reload when category changes
+    // Reload when category changes
     categoryDropdown.addEventListener("change", function () {
         loadSubCategories(this.value);
     });

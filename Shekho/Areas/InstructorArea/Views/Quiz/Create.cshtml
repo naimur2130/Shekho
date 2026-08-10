@@ -1,0 +1,144 @@
+﻿@model CreateQuizViewModel
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+}
+
+<style>
+    /* Page wrapper */
+    .quiz-wrapper {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 1rem;
+    }
+
+    /* Step 1 input card */
+    .quiz-step-card {
+        background: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Question cards */
+    .question-card {
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .question-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    }
+
+    .question-card .card-header {
+        background: linear-gradient(90deg, #a18cd1, #fbc2eb);
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.05rem;
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+    }
+
+    .question-card textarea {
+        resize: vertical;
+        min-height: 70px;
+    }
+
+    /* Option inputs */
+    .question-card input.form-control {
+        border-radius: 0.5rem;
+    }
+
+    /* Submit button */
+    .btn-save {
+        border-radius: 0.7rem;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+    }
+
+</style>
+
+<div class="quiz-wrapper">
+
+    <h3 class="mb-4">📝 Create Final Quiz</h3>
+
+    <!-- STEP 1: Enter number of questions -->
+    <div class="quiz-step-card">
+        <label class="form-label fw-semibold">Total Questions</label>
+        <div class="d-flex align-items-center gap-2">
+            <input type="number" id="questionCount" class="form-control w-25" min="1" max="50" />
+            <button type="button" class="btn btn-primary" onclick="generateQuestions()">
+                Generate Questions
+            </button>
+        </div>
+        <small class="text-muted">Enter the number of questions you want to create (max 50).</small>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <input type="hidden" asp-for="CourseId" />
+        <input type="hidden" asp-for="TotalQuestions" id="totalQuestions" />
+
+        <div id="quizContainer"></div>
+
+        <button type="submit" class="btn btn-success btn-save mt-3">
+            💾 Save All Questions
+        </button>
+    </form>
+</div>
+
+<script>
+    function generateQuestions() {
+        const count = document.getElementById("questionCount").value;
+        const container = document.getElementById("quizContainer");
+        container.innerHTML = "";
+        document.getElementById("totalQuestions").value = count;
+
+        for (let i = 0; i < count; i++) {
+            container.innerHTML += `
+            <div class="card question-card">
+                <div class="card-header">
+                    Question ${i + 1}
+                </div>
+                <div class="card-body">
+
+                    <input type="hidden" name="Quizzes[${i}].CourseId" value="@Model.CourseId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Question</label>
+                        <textarea name="Quizzes[${i}].Question" class="form-control" required></textarea>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <input name="Quizzes[${i}].OptionA" placeholder="Option A" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <input name="Quizzes[${i}].OptionB" placeholder="Option B" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <input name="Quizzes[${i}].OptionC" placeholder="Option C" class="form-control" required />
+                        </div>
+                        <div class="col-md-6">
+                            <input name="Quizzes[${i}].OptionD" placeholder="Option D" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Correct Answer</label>
+                        <select name="Quizzes[${i}].CorrectAnswer" class="form-select" required>
+                            <option value="">Select</option>
+                            <option value="A">Option A</option>
+                            <option value="B">Option B</option>
+                            <option value="C">Option C</option>
+                            <option value="D">Option D</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>`;
+        }
+    }
+</script>

@@ -1,0 +1,74 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml"; 
+    ViewData["Title"] = "Our Services";
+}
+
+<style>
+    /* Page wrapper */
+    .services-wrapper {
+        padding: 4rem 0;
+        background: #f8f9fa;
+    }
+
+    /* Service cards */
+    .service-card {
+        border-radius: 1rem;
+        padding: 2rem 1.5rem;
+        background: linear-gradient(135deg, #d8f3ff, #e0f7fa);
+        transition: transform 0.3s, box-shadow 0.3s;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    }
+
+    .service-card i {
+        font-size: 3rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+
+    .service-card h5 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #343a40;
+    }
+
+    .service-card p {
+        color: #495057;
+        font-size: 0.95rem;
+    }
+</style>
+
+<div class="container services-wrapper">
+    <h2 class="text-center mb-5">Our Services</h2>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="service-card text-center">
+                <i class="bi bi-laptop"></i>
+                <h5>Online Courses</h5>
+                <p>Learn at your own pace with our expertly designed online courses covering various skills and topics.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="service-card text-center">
+                <i class="bi bi-person-badge"></i>
+                <h5>Expert Instructors</h5>
+                <p>Get guidance and mentorship from experienced instructors in every field to enhance your learning journey.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="service-card text-center">
+                <i class="bi bi-award"></i>
+                <h5>Certification</h5>
+                <p>Receive official certificates upon course completion to showcase your skills to employers or clients.</p>
+            </div>
+        </div>
+    </div>
+</div>

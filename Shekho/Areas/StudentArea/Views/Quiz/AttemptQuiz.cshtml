@@ -1,0 +1,183 @@
+﻿@model StudentQuizViewModel
+@{
+    Layout = "~/Views/Shared/_AdminPage.cshtml";
+    int perQuestionTime = Model.IsRetake ? 30 : 40; 
+    int totalQuestions = Model.Quizzes.Count;
+    int totalTimeSeconds = totalQuestions * perQuestionTime;
+}
+
+<style>
+    /* Page wrapper */
+    .quiz-wrapper {
+        background: #f4f6f9;
+        padding: 2rem;
+        border-radius: 1rem;
+    }
+
+    /* Timer box */
+    .quiz-timer {
+        background: #fff3cd;
+        color: #856404;
+        padding: 0.8rem 1.2rem;
+        border-radius: 0.7rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        font-size: 1.1rem;
+    }
+
+    /* Question card */
+    .quiz-question-card {
+        background: #ffffff;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .quiz-question-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+
+    .quiz-question-card p {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Options grid */
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .option-box {
+        border: 2px solid #dee2e6;
+        border-radius: 0.7rem;
+        padding: 0.8rem 1rem;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #f8f9fa;
+    }
+
+    .option-box:hover {
+        border-color: #0d6efd;
+        background: #e7f1ff;
+    }
+
+    .option-box input[type="radio"] {
+        margin-right: 0.8rem;
+        accent-color: #0d6efd;
+        cursor: pointer;
+    }
+
+    .option-box.selected {
+        border-color: #0d6efd;
+        background: #d0e5ff;
+    }
+
+    /* Submit button */
+    .btn-submit {
+        border-radius: 0.7rem;
+        padding: 0.7rem 1.8rem;
+        font-weight: 600;
+    }
+</style>
+
+<div class="quiz-wrapper">
+    <h2 class="mb-4">📝 @Model.CourseTitle - Quiz</h2>
+
+    @if(TempData["Retake"] != null)
+    {
+        <div class="alert alert-warning">@TempData["Retake"]</div>
+    }
+
+    <div class="quiz-timer mb-4">
+        🕒 Time Remaining: <strong id="timer"></strong>
+    </div>
+
+    <form id="quizForm" asp-action="Submit" method="post">
+        <input type="hidden" name="CourseId" value="@Model.CourseId" />
+
+        @for (int i = 0; i < Model.Quizzes.Count; i++)
+        {
+            var q = Model.Quizzes[i];
+            <div class="quiz-question-card">
+                <p>@(i + 1). @q.Question</p>
+
+                <div class="options-grid">
+                    <label class="option-box">
+                        <input type="radio" name="answers[@q.QuizId]" value="A" required />
+                        @q.OptionA
+                    </label>
+                    <label class="option-box">
+                        <input type="radio" name="answers[@q.QuizId]" value="B" />
+                        @q.OptionB
+                    </label>
+                    <label class="option-box">
+                        <input type="radio" name="answers[@q.QuizId]" value="C" />
+                        @q.OptionC
+                    </label>
+                    <label class="option-box">
+                        <input type="radio" name="answers[@q.QuizId]" value="D" />
+                        @q.OptionD
+                    </label>
+                </div>
+            </div>
+        }
+
+        <button type="submit" class="btn btn-success btn-submit">
+            Submit Quiz
+        </button>
+    </form>
+</div>
+
+
+@section Scripts {
+<script>
+    // Timer
+    let totalTime = @totalTimeSeconds; 
+    const timerEl = document.getElementById("timer");
+    const form = document.getElementById("quizForm");
+
+    function updateTimer() {
+        let minutes = Math.floor(totalTime / 60);
+        let seconds = totalTime % 60;
+        timerEl.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        totalTime--;
+        if (totalTime < 0) {
+            clearInterval(timerInterval);
+            alert("⏰ Time is up! Submitting quiz automatically.");
+            form.submit();
+        }
+    }
+    updateTimer();
+    const timerInterval = setInterval(updateTimer, 1000);
+
+    // Highlight and toggle option selection
+    document.querySelectorAll('.option-box input[type="radio"]').forEach(input => {
+        input.addEventListener('click', function() {
+            const box = this.closest('.option-box');
+            const siblings = box.parentElement.querySelectorAll('.option-box');
+
+            // If already selected, unselect it
+            if (box.classList.contains('selected')) {
+                this.checked = false;
+                box.classList.remove('selected');
+            } else {
+                // Otherwise, select this one and deselect others
+                siblings.forEach(s => s.classList.remove('selected'));
+                this.checked = true;
+                box.classList.add('selected');
+            }
+        });
+    });
+</script>
+}
+

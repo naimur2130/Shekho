@@ -2,32 +2,85 @@
 @{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
-<h2>Delete Course</h2>
 
-<div class="alert alert-danger">
-    <strong>Warning!</strong>
-    This action cannot be undone.
+<style>
+    /* Card style */
+    .card-delete-course {
+        border-radius: 1rem;
+        background: #fff;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-delete-course:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.15);
+    }
+
+    .card-delete-course h5 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-delete-course p {
+        color: #555;
+    }
+
+    .img-thumbnail {
+        border-radius: 0.5rem;
+        max-width: 180px;
+        margin-top: 0.5rem;
+    }
+
+    .alert-danger {
+        font-weight: 500;
+        font-size: 1rem;
+    }
+
+    /* Buttons */
+    .btn-danger {
+        font-weight: 600;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.2s;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-secondary {
+        padding: 0.5rem 1.2rem;
+    }
+
+</style>
+
+<h2 class="mb-3">Delete Course</h2>
+
+<div class="alert alert-danger d-flex align-items-center">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <div>
+        <strong>Warning!</strong> This action cannot be undone.
+    </div>
 </div>
 
-<div class="card">
+<div class="card card-delete-course p-3">
     <div class="card-body">
         <h5>@Model.CourseTitle</h5>
         <p>@Model.CourseDescription</p>
 
         @if (!string.IsNullOrEmpty(Model.ThumbnailPath))
         {
-            <img src="@Model.ThumbnailPath"
-                 class="img-thumbnail mt-2"
-                 width="150" />
+            <img src="@Model.ThumbnailPath" class="img-thumbnail" />
         }
     </div>
 </div>
 
-<form asp-action="Delete" method="post" class="mt-3">
+<form asp-action="Delete" method="post" class="d-flex gap-2">
     <input type="hidden" asp-for="CourseId" />
-
+    
     <button type="submit" class="btn btn-danger">
-        Yes, Delete
+        <i class="bi bi-trash-fill me-1"></i> Yes, Delete
     </button>
 
     <a asp-action="Index" class="btn btn-secondary">

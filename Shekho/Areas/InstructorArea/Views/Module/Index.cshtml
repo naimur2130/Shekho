@@ -2,57 +2,110 @@
 @{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
-<h2>Sections - @ViewBag.CourseTitle</h2>
 
-<a asp-action="CreateModule"
-   asp-route-courseId="@ViewBag.CourseId"
-   class="btn btn-primary mb-3">
-    + Add Section
-</a>
+<style>
+    .card-sections {
+        background: #fff;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 2rem;
+    }
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Order</th>
-            <th>Title</th>
-            <th width="200">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var i in Model)
-        {
-            <tr>
-                <td>@i.Order</td>
-                <td>@i.CourseSectionName</td>
-                <td>
-                    <a asp-area="InstructorArea"
-                       asp-controller="Lesson"
-                       asp-action="Index"
-                       asp-route-moduleId="@i.CourseSectionId"
-                       class="btn btn-sm btn-info me-2">
-                        Lessons
-                    </a>
-                    <a asp-action="EditModule"
-                       asp-route-id="@i.CourseSectionId"
-                       class="btn btn-sm btn-warning">
-                        Edit
-                    </a>
+    .card-sections:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.15);
+    }
 
-                    <a asp-action="Delete"
-                       asp-route-id="@i.CourseSectionId"
-                       class="btn btn-sm btn-danger">
-                        Delete
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    .card-sections h2 {
+        color: #17a2b8;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
 
-<a asp-area="InstructorArea"
-   asp-controller="Course"
-   asp-action="Index"
-   class="btn btn-secondary">
-    Back to Courses
-</a>
+    .btn-primary, .btn-info, .btn-warning, .btn-danger, .btn-secondary {
+        transition: all 0.2s;
+    }
 
+    .btn-primary:hover { background-color: #0d6efd; }
+    .btn-info:hover { background-color: #0dcaf0; }
+    .btn-warning:hover { background-color: #ffc107; }
+    .btn-danger:hover { background-color: #dc3545; }
+    .btn-secondary:hover { background-color: #6c757d; }
+
+    table thead {
+        background-color: #e9f7f9;
+    }
+
+    table th, table td {
+        vertical-align: middle !important;
+    }
+
+    .action-buttons a {
+        margin-right: 0.3rem;
+    }
+</style>
+
+<div class="card card-sections">
+    <h2>Sections - @ViewBag.CourseTitle</h2>
+
+    <div class="mb-3 text-end">
+        <a asp-action="CreateModule"
+           asp-route-courseId="@ViewBag.CourseId"
+           class="btn btn-primary">
+            + Add Section
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th style="width:80px;">Order</th>
+                    <th>Title</th>
+                    <th width="250">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in Model)
+                {
+                    <tr>
+                        <td>@i.Order</td>
+                        <td>@i.CourseSectionName</td>
+                        <td class="action-buttons">
+                            <a asp-area="InstructorArea"
+                               asp-controller="Lesson"
+                               asp-action="Index"
+                               asp-route-moduleId="@i.CourseSectionId"
+                               class="btn btn-sm btn-info">
+                                Lessons
+                            </a>
+                            <a asp-action="EditModule"
+                               asp-route-id="@i.CourseSectionId"
+                               class="btn btn-sm btn-warning">
+                                Edit
+                            </a>
+                            <a asp-action="Delete"
+                               asp-route-id="@i.CourseSectionId"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure you want to delete this section?');">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-end mt-3">
+        <a asp-area="InstructorArea"
+           asp-controller="Course"
+           asp-action="Index"
+           class="btn btn-secondary">
+            Back to Courses
+        </a>
+    </div>
+</div>

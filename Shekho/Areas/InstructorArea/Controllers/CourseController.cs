@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Shekho.Data;
 using Shekho.Models;
+using Shekho.ViewModels;
 
 namespace Shekho.Areas.InstructorArea.Controllers
 {
     [Area("InstructorArea")]
+    [Authorize(Roles = "Instructor")]
     public class CourseController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -27,14 +30,29 @@ namespace Shekho.Areas.InstructorArea.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 return NotFound();
-            }
-            var CourseList = await _context.Course
-                .Where(u => u.InstructorId == user.Id && u.IsApproved)
+
+            var courses = await _context.Course
+                .Where(c => c.InstructorId == user.Id && c.IsApproved)
                 .ToListAsync();
-            return View(CourseList);
+
+            var courseVMs = new List<InstructorCourseViewModel>();
+
+            foreach (var course in courses)
+            {
+                bool hasQuiz = await _context.Quiz
+                    .AnyAsync(q => q.CourseId == course.CourseId);
+
+                courseVMs.Add(new InstructorCourseViewModel
+                {
+                    Course = course,
+                    HasQuiz = hasQuiz
+                });
+            }
+
+            return View(courseVMs);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -42,7 +60,7 @@ namespace Shekho.Areas.InstructorArea.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var course = await _context.Course
-                .FirstOrDefaultAsync(c => c.CourseId == id && c.InstructorId == user.Id);
+                .FirstOrDefaultAsync(c => c.CourseId == id && c.InstructorId == user!.Id);
 
             if (course == null)
                 return NotFound();
@@ -72,6 +90,7 @@ namespace Shekho.Areas.InstructorArea.Controllers
         [HttpGet]
         public IActionResult CreateCourse()
         {
+
             ViewBag.Categories = _context.CourseCategory.ToList();
 
             return View();
@@ -82,14 +101,20 @@ namespace Shekho.Areas.InstructorArea.Controllers
         public async Task<IActionResult> CreateCourse(Course course, IFormFile? Thumbnail)
         {
             var user = await _userManager.GetUserAsync (User);
-            course.InstructorId = user.Id; 
+            course.InstructorId = user!.Id; 
             if (user == null)
             {
                 return NotFound();
             }
             if (!ModelState.IsValid)
             {
-               // var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                ViewBag.Categories = _context.CourseCategory.ToList();
+                // var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return View(course);
+            }
+            if (course.CoursePrice < 0)
+            {
+                ViewBag.Categories = _context.CourseCategory.ToList();
                 return View(course);
             }
             if (Thumbnail != null)
@@ -102,7 +127,7 @@ namespace Shekho.Areas.InstructorArea.Controllers
                 await Thumbnail.CopyToAsync(stream);
                 course.ThumbnailPath = "/Upload/Courses/" + fileName;
             }
-            course.InstructorId = user.Id;
+            //course.InstructorId = user.Id;
             course.IsApproved = false;
             course.IsPublished = false;
             course.CreatedAt = DateTime.Now;
@@ -119,7 +144,7 @@ namespace Shekho.Areas.InstructorArea.Controllers
         public async Task<IActionResult> EditCourse(int id)
         {
             var user = await _userManager.GetUserAsync(User);
-            var course = await _context.Course.FirstOrDefaultAsync(u => u.CourseId == id);
+            var course = await _context.Course.FirstOrDefaultAsync(u => u.CourseId == id && u.InstructorId == user!.Id);
             if (course == null)
             {
                 return NotFound();
@@ -134,7 +159,8 @@ namespace Shekho.Areas.InstructorArea.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCourse(int id, Course course, IFormFile? Thumbnail)
         {
-            var model = await _context.Course.FirstOrDefaultAsync(c => c.CourseId == id);
+            var user = await _userManager.GetUserAsync(User);
+            var model = await _context.Course.FirstOrDefaultAsync(c => c.CourseId == id && c.InstructorId==user!.Id);
 
             if (model == null)
                 return NotFound();
@@ -190,7 +216,7 @@ namespace Shekho.Areas.InstructorArea.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var user = await _userManager.GetUserAsync(User);
-            var course = await _context.Course.FirstOrDefaultAsync(u => u.CourseId == id && u.InstructorId==user.Id);
+            var course = await _context.Course.FirstOrDefaultAsync(u => u.CourseId == id && u.InstructorId==user!.Id);
             if (course == null)
             {
                 return NotFound();
@@ -203,7 +229,7 @@ namespace Shekho.Areas.InstructorArea.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var user = await _userManager.GetUserAsync (User);
-            var course = await _context.Course.FirstOrDefaultAsync(u => u.CourseId == id && u.InstructorId==user.Id);
+            var course = await _context.Course.FirstOrDefaultAsync(u => u.CourseId == id && u.InstructorId==user!.Id);
             if (course == null)
             {
                 return NotFound();
@@ -221,6 +247,21 @@ namespace Shekho.Areas.InstructorArea.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkCompleted(int id)
+        {
+            var course = await _context.Course.FindAsync(id);
+
+            if (course == null)
+                return NotFound();
+
+            course.IsCompleted = true;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
     }
 }

@@ -1,54 +1,122 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Shekho.Data;
 using Shekho.Models;
-using System.Diagnostics;
+using Shekho.ViewModels;
 
-namespace Shekho.Controllers
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly ApplicationDbContext _context;
+    private readonly UserManager<IdentityUser> _userManager;
+
+    public HomeController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        _context = context;
+        _userManager = userManager;
+    }
 
-        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager)
+    [HttpGet]
+    public async Task<IActionResult> Index(
+        int? categoryId,
+        int? subCategoryId,
+        DifficultyLevel? difficulty,
+        string searchTerm)
+    {
+        var query = _context.Course
+            .Include(c => c.Category)
+            .Include(c => c.SubCategory)
+            .Where(c => c.IsApproved && c.IsPublished)
+            .AsQueryable();
+
+        if (categoryId.HasValue)
+            query = query.Where(c => c.CategoryId == categoryId);
+
+        if (subCategoryId.HasValue)
+            query = query.Where(c => c.SubCategoryId == subCategoryId);
+
+        if (difficulty.HasValue)
+            query = query.Where(c => c.DifficultyLevel == difficulty);
+
+        if (!string.IsNullOrEmpty(searchTerm))
+            query = query.Where(c => c.CourseTitle.Contains(searchTerm));
+
+        var courses = await query.ToListAsync();
+
+        var userId = _userManager.GetUserId(User);
+
+        var enrolledCourseIds = new List<int>();
+        if (userId != null)
         {
-            _logger = logger;
-            _userManager = userManager;
+            enrolledCourseIds = await _context.Enrollment
+                .Where(e => e.StudentId == userId)
+                .Select(e => e.CourseId)
+                .ToListAsync();
         }
 
-        public async Task<IActionResult> Index()
+        var model = new CourseBrowsingViewModel
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            Courses = courses,
+            Categories = await _context.CourseCategory.ToListAsync(),
+            SubCategories = await _context.CourseSubCategory.ToListAsync(),
+            SelectedCategoryId = categoryId,
+            SelectedSubCategoryId = subCategoryId,
+            SelectedDifficulty = difficulty,
+            SearchTerm = searchTerm,
+            EnrolledCourseIds = enrolledCourseIds
+        };
 
-            var user = await _userManager.GetUserAsync(User);
+        return View(model);
+    }
+    public async Task<IActionResult> Details(int id)
+    {
+        var course = await _context.Course
+            .Include(c => c.Category)
+            .Include(c => c.SubCategory)
+            .Include(c => c.courseSections)!
+                .ThenInclude(s => s.Lesson)
+            .FirstOrDefaultAsync(c => c.CourseId == id && c.IsApproved);
 
-            if (await _userManager.IsInRoleAsync(user, "Admin"))
-            {
-                return RedirectToAction("Index", "Admin", new { area = "AdminArea" });
-            }
-            else if (await _userManager.IsInRoleAsync(user, "Instructor"))
-            {
-                return RedirectToAction("Index", "Instructor", new { area = "InstructorArea" });
-            }
-            else if (await _userManager.IsInRoleAsync(user, "Student"))
-            {
-                return RedirectToAction("Index", "Student", new { area = "StudentArea" });
-            }
-            return View("AccessDenied");
+        if (course == null)
+            return NotFound();
+
+        var userId = _userManager.GetUserId(User);
+
+        bool isEnrolled = false;
+        if (userId != null)
+        {
+            isEnrolled = await _context.Enrollment
+                .AnyAsync(e => e.CourseId == id && e.StudentId == userId);
         }
 
-        public IActionResult Privacy()
+        var model = new CourseDetailsViewModel
         {
-            return View();
-        }
+            Course = course,
+            IsEnrolled = isEnrolled
+        };
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        return View(model);
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetByCategory(int categoryId)
+    {
+        var subCategories = await _context.CourseSubCategory
+            .Where(s => s.CategoryId == categoryId)
+            .Select(s => new
+            {
+                subCategoryId = s.SubCategoryId,
+                subCategoryName = s.SubCategoryName
+            })
+            .ToListAsync();
+
+        return Json(subCategories);
+    }
+    public IActionResult OurService()
+    {
+        return View();
+    }
+    public IActionResult ContactUs()
+    {
+        return View();
     }
 }

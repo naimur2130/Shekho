@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shekho.Data;
 using Shekho.Models;
@@ -7,15 +9,17 @@ using Shekho.ViewModels;
 namespace Shekho.Areas.StudentArea.Controllers
 {
     [Area("StudentArea")]
+    [Authorize(Roles = "Student")]
     public class CourseController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public CourseController(ApplicationDbContext context)
+        public CourseController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
-
         [HttpGet]
         public async Task<IActionResult> Index(
             int? categoryId,
@@ -26,34 +30,45 @@ namespace Shekho.Areas.StudentArea.Controllers
             var query = _context.Course
                 .Include(c => c.Category)
                 .Include(c => c.SubCategory)
-                .Where(c => c.IsApproved) 
+                .Where(c => c.IsApproved && c.IsPublished)
                 .AsQueryable();
 
             if (categoryId.HasValue)
-                query = query.Where(c => c.CategoryId == categoryId.Value);
+                query = query.Where(c => c.CategoryId == categoryId);
 
             if (subCategoryId.HasValue)
-                query = query.Where(c => c.SubCategoryId == subCategoryId.Value);
+                query = query.Where(c => c.SubCategoryId == subCategoryId);
 
             if (difficulty.HasValue)
-                query = query.Where(c => c.DifficultyLevel == difficulty.Value);
+                query = query.Where(c => c.DifficultyLevel == difficulty);
 
             if (!string.IsNullOrEmpty(searchTerm))
                 query = query.Where(c => c.CourseTitle.Contains(searchTerm));
 
+            var courses = await query.ToListAsync();
+
+            var userId = _userManager.GetUserId(User);
+
+            var enrolledCourseIds = new List<int>();
+
+            if (userId != null)
+            {
+                enrolledCourseIds = await _context.Enrollment
+                    .Where(e => e.StudentId == userId)
+                    .Select(e => e.CourseId)
+                    .ToListAsync();
+            }
+
             var model = new CourseBrowsingViewModel
             {
-                Courses = await query.ToListAsync(),
+                Courses = courses,
                 Categories = await _context.CourseCategory.ToListAsync(),
-                SubCategories = categoryId.HasValue
-                  ? await _context.CourseSubCategory
-                  .Where(s => s.CategoryId == categoryId.Value)
-                  .ToListAsync()
-                  : new List<CourseSubCategory>(),
+                SubCategories = await _context.CourseSubCategory.ToListAsync(),
                 SelectedCategoryId = categoryId,
                 SelectedSubCategoryId = subCategoryId,
                 SelectedDifficulty = difficulty,
-                SearchTerm = searchTerm
+                SearchTerm = searchTerm,
+                EnrolledCourseIds = enrolledCourseIds
             };
 
             return View(model);
@@ -71,8 +86,24 @@ namespace Shekho.Areas.StudentArea.Controllers
             if (course == null)
                 return NotFound();
 
-            return View(course);
+            var userId = _userManager.GetUserId(User);
+
+            bool isEnrolled = false;
+            if (userId != null)
+            {
+                isEnrolled = await _context.Enrollment
+                    .AnyAsync(e => e.CourseId == id && e.StudentId == userId);
+            }
+
+            var model = new CourseDetailsViewModel
+            {
+                Course = course,
+                IsEnrolled = isEnrolled
+            };
+
+            return View(model);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetByCategory(int categoryId)

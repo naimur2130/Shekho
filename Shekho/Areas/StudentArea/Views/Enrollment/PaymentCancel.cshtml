@@ -1,0 +1,93 @@
+﻿@model CourseBrowsingViewModel
+@{
+    Layout="~/Views/Shared/_AdminPage.cshtml";
+}
+
+<style>
+        body {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .cancel-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .cancel-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 20px;
+        }
+
+        .cancel-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+
+        .cancel-text {
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .btn-custom {
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: #fff;
+        }
+    </style>
+<body>
+
+    <div class="cancel-card">
+        <div class="cancel-icon">
+            ✕
+        </div>
+
+        <h1 class="cancel-title">Payment Cancelled</h1>
+
+        <p class="cancel-text">
+            Your payment process was cancelled.  
+            No charges were made to your account.
+        </p>
+
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+    <a asp-controller="Course"
+       asp-action="Index"
+       class="btn btn-primary btn-custom">
+        Go to Home
+    </a>
+
+    <a asp-controller="Enrollment"
+       asp-action="Enroll" asp-route-courseId="@Model.SelectedCourseId"
+       class="btn btn-outline-secondary btn-custom">
+        Try Again
+    </a>
+</div>
+
+    </div>
+
+</body>

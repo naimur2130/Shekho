@@ -1,3 +1,150 @@
-﻿@{
+﻿@model InstructorDashboardViewModel
+@{
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
+
+<style>
+    .dashboard-wrapper {
+        background: #f4f6f9;
+        padding: 2rem;
+        border-radius: 1rem;
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 1rem;
+        color: #fff;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        transition: transform 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.85;
+    }
+
+    .bg-courses {
+        background: linear-gradient(135deg, #4e73df, #224abe);
+    }
+
+    .bg-students {
+        background: linear-gradient(135deg, #1cc88a, #13855c);
+    }
+
+    .bg-earnings {
+        background: linear-gradient(135deg, #f6c23e, #dda20a);
+    }
+
+    .bg-admin {
+        background: linear-gradient(135deg, #e74a3b, #be2617);
+    }
+
+    .analytics-card {
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    .analytics-table th {
+        background-color: #f8f9fc;
+        font-weight: 600;
+    }
+</style>
+
+<div class="dashboard-wrapper">
+
+    <h2 class="mb-4 fw-semibold">
+        <i class="bi bi-speedometer2 me-2"></i> Instructor Dashboard
+    </h2>
+
+    <!-- STAT CARDS -->
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-3">
+            <div class="card stat-card bg-courses">
+                <div class="card-body text-center">
+                    <div class="stat-icon mb-2">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </div>
+                    <h6>Total Courses</h6>
+                    <h2 class="fw-bold">@Model.TotalCourses</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card bg-students">
+                <div class="card-body text-center">
+                    <div class="stat-icon mb-2">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h6>Total Students</h6>
+                    <h2 class="fw-bold">@Model.TotalStudents</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card bg-earnings">
+                <div class="card-body text-center">
+                    <div class="stat-icon mb-2">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <h6>Your Earnings</h6>
+                    <h2 class="fw-bold">৳@Model.InstructorRevenue</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card bg-admin">
+                <div class="card-body text-center">
+                    <div class="stat-icon mb-2">
+                        <i class="bi bi-bank"></i>
+                    </div>
+                    <h6>Admin Cut (30%)</h6>
+                    <h2 class="fw-bold">৳@Model.AdminRevenue</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ANALYTICS TABLE -->
+    <div class="card analytics-card">
+        <div class="card-header bg-white border-0">
+            <h5 class="mb-0 fw-semibold">
+                <i class="bi bi-graph-up-arrow me-2"></i>
+                My Courses Analytics
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <table class="table analytics-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th class="text-center">Students</th>
+                        <th class="text-end">Revenue (You)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model.Courses)
+                    {
+                        <tr>
+                            <td>@c.CourseTitle</td>
+                            <td class="text-center">@c.EnrolledStudents</td>
+                            <td class="text-end fw-semibold text-success">
+                                ৳@c.Revenue
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

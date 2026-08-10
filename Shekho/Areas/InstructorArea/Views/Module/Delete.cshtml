@@ -3,26 +3,71 @@
     Layout = "~/Views/Shared/_AdminPage.cshtml";
 }
 
-<h2>Delete Section</h2>
+<style>
+    .card-delete-section {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        border-radius: 1rem;
+        background: #fff;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
 
-<div class="alert alert-danger">
-    Are you sure you want to delete this section?
+    .card-delete-section:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 40px rgba(0,0,0,0.15);
+    }
+
+    .card-delete-section h2 {
+        color: #dc3545;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-name {
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin-bottom: 2rem;
+        color: #333;
+    }
+
+    .btn-danger {
+        transition: all 0.2s;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-secondary:hover {
+        background-color: #6c757d;
+        border-color: #5c636a;
+    }
+
+</style>
+
+<div class="card card-delete-section">
+    <h2>Delete Section</h2>
+
+    <div class="alert alert-danger">
+        <strong>Warning!</strong> This action cannot be undone.
+    </div>
+
+    <p class="section-name">@Model.CourseSectionName</p>
+
+    <form method="post">
+        <input type="hidden" asp-for="CourseSectionId" />
+
+        <div class="d-flex justify-content-center gap-3">
+            <button type="submit" class="btn btn-danger px-4">Yes, Delete</button>
+            <a asp-action="Index"
+               asp-route-courseId="@Model.CourseId"
+               class="btn btn-secondary px-4">
+                Cancel
+            </a>
+        </div>
+    </form>
 </div>
-
-<p><strong>@Model.CourseSectionName</strong></p>
-
-<form method="post">
-    <input type="hidden" asp-for="CourseSectionId" />
-
-    <button type="submit" class="btn btn-danger">
-        Yes, Delete
-    </button>
-
-    <a asp-action="Index"
-       asp-route-courseId="@Model.CourseId"
-       class="btn btn-secondary">
-        Cancel
-    </a>
-</form>
-
-
